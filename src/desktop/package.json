@@ -1,0 +1,50 @@
+{
+  "name": "desktop",
+  "version": "1.0.0",
+  "description": "Desktop wrapper for web app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [],
+  "author": {
+    "name": "EmmanuelOZ",
+    "email": "davidozuna84@hotmail.com"
+  },
+  "homepage": "https://github.com/tu-usuario/on-library",
+  "build": {
+    "appId": "com.emmanueloz.onlibrary",
+    "productName": "On Library",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      {
+        "from": "../web/dist",
+        "to": "dist"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Education"
+    }
+  },
+  "devDependencies": {
+    "electron": "41.0.4",
+    "electron-builder": "26.8.1"
+  },
+  "dependencies": {
+    "electron-serve": "3.0.1"
+  }
+}

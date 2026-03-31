@@ -1,0 +1,25 @@
+{
+  "name": "on-library",
+  "version": "1.0.0",
+  "description": "Monorepo for on-library",
+  "private": true,
+  "scripts": {
+    "build:web": "pnpm --filter web run build",
+    "build:desktop": "pnpm --filter desktop run build",
+    "build:all": "pnpm --filter web run build && pnpm --filter desktop run build",
+    "start:server": "pnpm --filter server run start",
+    "dev:server": "pnpm --filter server run dev",
+    "dev:web": "pnpm --filter web run dev",
+    "dev:desktop": "pnpm --filter desktop run dev"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "electron",
+      "better-sqlite3",
+      "prisma",
+      "@prisma/client",
+      "@prisma/engines"
+    ]
+  }
+}
