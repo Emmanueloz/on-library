@@ -6,3 +6,5 @@ prisma/prisma-client
 
 *.db
 *.sqlite
+
+media/

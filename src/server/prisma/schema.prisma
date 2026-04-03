@@ -11,3 +11,77 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+
+model User {
+  id        String      @id @default(cuid())
+  username  String
+  email     String      @unique
+  password  String
+  createdAt DateTime    @default(now())
+  libraries Libraries[]
+}
+
+model Libraries {
+  id        String   @id @default(cuid())
+  name      String
+  user      User     @relation(fields: [idUser], references: [id])
+  idUser    String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Series {
+  id              String         @id @default(cuid())
+  title           String
+  description     String
+  author          String
+  createdAt       DateTime       @default(now())
+  publicationDate DateTime
+  category        Categories     @relation(fields: [idCategory], references: [id])
+  idCategory      String
+  chapters        Chapter[]
+  tagsOnSeries    TagsOnSeries[]
+}
+
+model Categories {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  series    Series[]
+}
+
+model Tags {
+  id           String         @id @default(cuid())
+  name         String
+  createdAt    DateTime       @default(now())
+  tagsOnSeries TagsOnSeries[]
+}
+
+model TagsOnSeries {
+  series   Series @relation(fields: [idSeries], references: [id])
+  idSeries String
+  tag      Tags   @relation(fields: [idTag], references: [id])
+  idTag    String
+
+  @@id([idSeries, idTag])
+}
+
+model Chapter {
+  id        String   @id @default(cuid())
+  series    Series   @relation(fields: [idSeries], references: [id])
+  idSeries  String
+  pages     Pages[]
+  title     String
+  number    Float
+  createdAt DateTime @default(now())
+}
+
+model Pages {
+  id         String   @id @default(cuid())
+  chapter    Chapter  @relation(fields: [idChapter], references: [id])
+  idChapter  String
+  pageNumber Float
+  url        String
+  type       String
+  createdAt  DateTime @default(now())
+}
