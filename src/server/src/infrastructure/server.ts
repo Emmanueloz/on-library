@@ -38,15 +38,15 @@ export async function buildServer(fastify: FastifyInstance) {
     forceESM: true,
   });
 
-  fastify.register(fastifyAutoload, {
-    dir: join(__dirname, "services"),
-    forceESM: true,
-  });
-
   const client = new ClientPrisma().getClient();
 
   fastify.register(fastifyPrisma, {
     client: client,
+  });
+
+  fastify.register(fastifyAutoload, {
+    dir: join(__dirname, "services"),
+    forceESM: true,
   });
 
   fastify.register(fastifyAutoload, {
