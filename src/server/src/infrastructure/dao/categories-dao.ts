@@ -12,7 +12,11 @@ class CategoriesDao implements ICategoriesRepo {
     return await this.client.categories.findMany();
   }
   async getById(id: string): Promise<ICategories | null> {
-    throw new Error("Method not implemented.");
+    return await this.client.categories.findUnique({
+      where: {
+        id,
+      },
+    });
   }
   async create(category: Omit<ICategories, "id">): Promise<ICategories> {
     return await this.client.categories.create({
@@ -23,9 +27,16 @@ class CategoriesDao implements ICategoriesRepo {
   }
   async update(
     id: string,
-    category: Partial<ICategories>,
+    category: ICategories,
   ): Promise<ICategories | null> {
-    throw new Error("Method not implemented.");
+    return await this.client.categories.update({
+      where: {
+        id,
+      },
+      data: {
+        name: category.name,
+      },
+    });
   }
   async delete(id: string): Promise<boolean> {
     await this.client.categories.delete({
