@@ -33,8 +33,11 @@ export default async function (fastify: FastifyInstance) {
     async (request, reply) => {
       const { id } = request.params;
 
+      const category = await fastify.categoriesService.getById(id);
+
       return {
-        message: `Categories ${id}`,
+        message: `Categories ${category?.name}`,
+        data: category,
       };
     },
   );
