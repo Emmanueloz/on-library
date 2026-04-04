@@ -4,6 +4,13 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "../../../prisma/prisma-client/client.ts";
 import { config } from "../../config/index.ts";
 
+
+declare module "fastify" {
+  interface FastifyInstance {
+    prisma: PrismaClient;
+  }
+}
+
 class ClientPrisma implements IClientDbRepo {
   private client: Client;
   getClient(): Client {
