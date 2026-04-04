@@ -1,7 +1,9 @@
 import * as Params from './params.ts'
+import * as Body from "./body.ts";
 
 const TagsSchema = {
-    Params
+    Params,
+    Body
 }
 
 export { TagsSchema }

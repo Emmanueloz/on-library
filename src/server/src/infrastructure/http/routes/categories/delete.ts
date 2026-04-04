@@ -13,8 +13,12 @@ export default async function (fastify: FastifyInstance) {
         }
     }, async (request, reply) => {
         const { id } = request.params
+
+        reply.log.info(`Deleting category with id: ${id}`)
+
+        await fastify.categoriesService.delete(id)
         return {
-            message: "Categories",
+            message: "Categories deleted successfully",
         };
     });
 }

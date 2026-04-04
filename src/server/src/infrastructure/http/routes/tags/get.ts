@@ -9,8 +9,12 @@ export default async function (fastify: FastifyInstance) {
             tags: ["Tags"],
         }
     }, async (request, reply) => {
+        const tags = await fastify.tagsServices.query();
+        console.log(tags);
+        
         return {
             message: "Tags",
+            data: tags
         };
     });
 
