@@ -1,4 +1,4 @@
-type CreateBodyType = {
+type CreatePagesBodyType = {
   file: {
     type: "field" | "file";
     fieldname?: string;
@@ -28,4 +28,5 @@ type CreateBodyType = {
   };
 };
 
-export { type CreateBodyType };
+type UpdatePagesBodyType = Partial<CreatePagesBodyType>;
+export type { CreatePagesBodyType, UpdatePagesBodyType };
