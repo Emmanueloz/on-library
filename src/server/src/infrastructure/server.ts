@@ -1,17 +1,17 @@
 import type { FastifyInstance } from "fastify";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+
 import fastifyAutoload from "@fastify/autoload";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import fastifyStatic from "@fastify/static";
 import fastifyPrisma from "@joggr/fastify-prisma";
+import fastifyMultipart from "@fastify/multipart";
 
 import { ClientPrisma } from "./services/client-prisma.ts";
 import { errorHandler } from "./http/errors/index.ts";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { DIRNAME_PROJECT, MEDIA_DIR } from "./constants/index.ts";
+import { join } from "node:path";
+import type { Readable } from "node:stream";
 
 declare module "fastify" {
   interface FastifySchema {
@@ -19,23 +19,46 @@ declare module "fastify" {
     description?: string;
     summary?: string;
   }
+  interface FastifyRequest {
+    file(): Promise<{
+      file: Readable;
+      fieldname: string;
+      filename: string;
+      encoding: string;
+      mimetype: string;
+      fields: Record<string, { value: string }>;
+      toBuffer(): Promise<Buffer>;
+    }>;
+    parts(): AsyncIterable<{
+      type: "field" | "file";
+      fieldname?: string;
+      filename?: string;
+      value?: string;
+      mimetype?: string;
+      encoding?: string;
+      toBuffer(): Promise<Buffer>;
+    }>;
+  }
 }
 
+const fastifyMultipartOptions = {
+  limits: {
+    fileSize: 50 * 1024 * 1024,
+  },
+};
+
 export async function buildServer(fastify: FastifyInstance) {
+  fastify.register(fastifyMultipart, fastifyMultipartOptions);
+
   fastify.register(fastifySwagger);
   fastify.register(fastifySwaggerUi, {
     routePrefix: "/documentation",
   });
-  console.log(join(__dirname, "../../media"));
+  console.log(MEDIA_DIR);
 
   fastify.register(fastifyStatic, {
-    root: join(__dirname, "../../media"),
+    root: MEDIA_DIR,
     prefix: "/media/",
-  });
-
-  fastify.register(fastifyAutoload, {
-    dir: join(__dirname, "plugins"),
-    forceESM: true,
   });
 
   const client = new ClientPrisma().getClient();
@@ -45,12 +68,12 @@ export async function buildServer(fastify: FastifyInstance) {
   });
 
   fastify.register(fastifyAutoload, {
-    dir: join(__dirname, "services"),
+    dir: join(DIRNAME_PROJECT, "plugins"),
     forceESM: true,
   });
 
   fastify.register(fastifyAutoload, {
-    dir: join(__dirname, "http/routes"),
+    dir: join(DIRNAME_PROJECT, "http/routes"),
     routeParams: true,
     options: {
       prefix: "/api",
