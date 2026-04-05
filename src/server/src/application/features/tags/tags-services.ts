@@ -11,7 +11,7 @@ class TagsServices {
   async query(name?: string): Promise<ITags[]> {
     return await this.tagsRepo.query(name);
   }
-  async getById(id: string): Promise<ITags> {
+  async getById(id: string): Promise<ITags | null> {
     return await this.tagsRepo.getById(id);
   }
   async create(tags: ITags): Promise<ITags> {

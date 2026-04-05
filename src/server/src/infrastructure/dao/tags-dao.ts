@@ -12,9 +12,17 @@ class TagsDao implements ITagsRepo {
     const tags = await this.client.tags.findMany();
     return tags;
   }
-  async getById(id: string): Promise<ITags> {
-    throw new Error("Method not implemented.");
+
+  async getById(id: string): Promise<ITags | null> {
+    const tag = await this.client.tags.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return tag;
   }
+
   async create(tags: ITags): Promise<ITags> {
     const createdTag = await this.client.tags.create({
       data: {
@@ -23,11 +31,25 @@ class TagsDao implements ITagsRepo {
     });
     return createdTag;
   }
+
   async update(id: string, tags: ITags): Promise<ITags> {
-    throw new Error("Method not implemented.");
+    const updatedTag = await this.client.tags.update({
+      where: {
+        id,
+      },
+      data: {
+        name: tags.name,
+      },
+    });
+    return updatedTag;
   }
+
   async delete(id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    await this.client.tags.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
 
