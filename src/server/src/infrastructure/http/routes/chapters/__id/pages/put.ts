@@ -2,10 +2,12 @@ import type { FastifyInstance } from "fastify";
 import type { ChapterIdParamsType } from "../../../../schemas/chapters/params.ts";
 import type { PageIdParamsType } from "../../../../schemas/pages/params.ts";
 import { ALLOWED_IMAGE_TYPES } from "../../../../../constants/index.ts";
+import type { UpdatePagesBodyType } from "../../../../schemas/pages/body.ts";
 
 export default async function (fastify: FastifyInstance) {
   fastify.put<{
     Params: ChapterIdParamsType & PageIdParamsType;
+    Body: UpdatePagesBodyType;
   }>(
     "/:pageId",
     {
@@ -23,23 +25,9 @@ export default async function (fastify: FastifyInstance) {
         });
       }
 
-      let fileData = null;
-      let pageNumberInput: string | undefined;
-      let typeInput: string | undefined;
-
-      const parts = request.parts();
-      for await (const part of parts) {
-        if (part.type === "file") {
-          fileData = part;
-        } else if (part.type === "field") {
-          if (part.fieldname === "pageNumber") {
-            pageNumberInput = String(part.value);
-          }
-          if (part.fieldname === "type") {
-            typeInput = String(part.value);
-          }
-        }
-      }
+      const fileData = request.body.file;
+      const pageNumberInput = request.body.pageNumber?.value;
+      const typeInput = request.body.type?.value;
 
       if (fileData && !ALLOWED_IMAGE_TYPES.includes(fileData.mimetype ?? "")) {
         return reply.status(400).send({
@@ -50,7 +38,7 @@ export default async function (fastify: FastifyInstance) {
       const params: any = {
         id: pageId,
       };
-      
+
       if (pageNumberInput !== undefined)
         params.newPageNumber = parseFloat(pageNumberInput);
       if (typeInput) params.newType = typeInput;

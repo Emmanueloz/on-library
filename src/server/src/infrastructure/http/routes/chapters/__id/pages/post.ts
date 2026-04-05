@@ -1,12 +1,12 @@
 import type { FastifyInstance } from "fastify";
 import type { ChapterIdParamsType } from "../../../../schemas/chapters/params.ts";
 import { ALLOWED_IMAGE_TYPES } from "../../../../../constants/index.ts";
-import { type CreateBodyType } from "../../../../schemas/pages/body.ts";
+import { type CreatePagesBodyType } from "../../../../schemas/pages/body.ts";
 
 export default async function (fastify: FastifyInstance) {
   fastify.post<{
     Params: ChapterIdParamsType;
-    Body: CreateBodyType;
+    Body: CreatePagesBodyType;
   }>(
     "/",
     {
