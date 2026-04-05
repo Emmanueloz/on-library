@@ -47,16 +47,21 @@ export default async function (fastify: FastifyInstance) {
         });
       }
 
-      const page = await fastify.pagesService.updateWithImage({
+      const params: any = {
         id: pageId,
-        newPageNumber: pageNumberInput !== undefined ? parseFloat(pageNumberInput) : undefined,
-        newType: typeInput,
-        newFileName: fileData?.filename,
-        newBuffer: fileData ? await fileData.toBuffer() : undefined,
-        oldUrl: existingPage.url,
-        baseUrl: `${request.protocol}://${request.host}`,
-      });
+      };
+      
+      if (pageNumberInput !== undefined)
+        params.newPageNumber = parseFloat(pageNumberInput);
+      if (typeInput) params.newType = typeInput;
+      if (fileData) {
+        params.newFileName = fileData.filename;
+        params.newBuffer = await fileData.toBuffer();
+        params.oldUrl = existingPage.url;
+        params.baseUrl = `${request.protocol}://${request.host}`;
+      }
 
+      const page = await fastify.pagesService.updateWithImage(params);
       return {
         message: "Page updated",
         data: page,
