@@ -15,6 +15,7 @@ import type { Readable } from "node:stream";
 
 declare module "fastify" {
   interface FastifySchema {
+    consumes?: string[];
     tags?: string[];
     description?: string;
     summary?: string;
@@ -45,6 +46,7 @@ const fastifyMultipartOptions = {
   limits: {
     fileSize: 50 * 1024 * 1024,
   },
+  attachFieldsToBody: true,
 };
 
 export async function buildServer(fastify: FastifyInstance) {
