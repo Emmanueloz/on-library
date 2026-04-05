@@ -13,7 +13,7 @@ export default async function (fastify: FastifyInstance) {
 
         const { name } = request.body;
 
-        const tags = await fastify.tagsServices.create({ name });
+        const tags = await fastify.tagsService.create({ name });
         return  reply.status(201).send({
             message: "Tag created",
             data: tags
