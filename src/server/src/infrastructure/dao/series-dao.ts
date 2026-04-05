@@ -10,7 +10,7 @@ class SeriesDao implements ISeriesRepo {
     this.client = client;
   }
 
-  async query(query?: IQuerySeries): Promise<ISeries[]> {
+  async query(q?: IQuerySeries): Promise<ISeries[]> {
     const series = await this.client.series.findMany({
       include: {
         category: true,
@@ -26,8 +26,19 @@ class SeriesDao implements ISeriesRepo {
 
     return series;
   }
-  async getById(id: string): Promise<ISeries> {
-    throw new Error("Method not implemented.");
+  async getById(id: string): Promise<ISeries | null> {
+    return await this.client.series.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        tagsOnSeries: {
+          include: {
+            tag: true,
+          },
+        },
+        chapters: true,
+      },
+    });
   }
   async create(series: Omit<ISeries, "id">): Promise<ISeries> {
     return await this.client.series.create({

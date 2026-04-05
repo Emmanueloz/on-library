@@ -8,10 +8,10 @@ class SeriesService {
   constructor(seriesRepo: ISeriesRepo) {
     this.seriesRepo = seriesRepo;
   }
-  async query(query?: IQuerySeries): Promise<ISeries[]> {
-    return await this.seriesRepo.query(query);
+  async query(q?: IQuerySeries): Promise<ISeries[]> {
+    return await this.seriesRepo.query(q);
   }
-  async getById(id: string): Promise<ISeries> {
+  async getById(id: string): Promise<ISeries | null> {
     return await this.seriesRepo.getById(id);
   }
   async create(series: ISeries): Promise<ISeries> {
