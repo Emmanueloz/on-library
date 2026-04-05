@@ -8,12 +8,15 @@ import type { ITagsRepo } from "../../application/features/tags/tags-repo.ts";
 import { TagsDao } from "../dao/tags-dao.ts";
 import { CategoriesServices } from "../../application/features/categories/categories-services.ts";
 import { CategoriesDao } from "../dao/categories-dao.ts";
+import { ChaptersDao } from "../dao/chapters-dao.ts";
+import { ChaptersService } from "../../application/features/chapters/chapters-service.ts";
 
 declare module "fastify" {
   interface FastifyInstance {
     seriesService: SeriesService;
-    tagsServices: TagsServices;
+    tagsService: TagsServices;
     categoriesService: CategoriesServices;
+    chaptersService: ChaptersService;
   }
 }
 
@@ -27,7 +30,11 @@ export default fp(async (fastify: FastifyInstance) => {
   const categoriesRepo = new CategoriesDao(fastify.prisma);
   const categoriesService = new CategoriesServices(categoriesRepo);
 
+  const chaptersRepo = new ChaptersDao(fastify.prisma);
+  const chaptersService = new ChaptersService(chaptersRepo);
+
   fastify.decorate("seriesService", seriesService);
-  fastify.decorate("tagsServices", tagsService);
+  fastify.decorate("tagsService", tagsService);
   fastify.decorate("categoriesService", categoriesService);
+  fastify.decorate("chaptersService", chaptersService);
 });
