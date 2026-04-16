@@ -3,7 +3,7 @@ import type { IPages } from "./pages.interface.ts";
 
 export interface IChapter {
   id?: string;
-  series?: ISeries;
+  series?: Partial<ISeries>;
   idSeries: string;
   pages?: IPages[];
   title: string;

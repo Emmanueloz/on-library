@@ -1,9 +1,11 @@
 import type { ICategories } from "./categories.interface.ts";
 import type { IChapter } from "./chapter.interface.ts";
+import type { ITagsOnSeries } from "./tags-on-series.interface.ts";
 
 export interface ISeries {
   id?: string;
   title: string;
+  pictureUrl: string;
   description: string;
   author: string;
   createdAt?: Date;
@@ -11,4 +13,5 @@ export interface ISeries {
   category?: ICategories;
   idCategory: string;
   chapters?: IChapter[];
+  tagsOnSeries?: ITagsOnSeries[];
 }
