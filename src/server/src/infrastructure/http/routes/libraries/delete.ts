@@ -17,4 +17,10 @@ export default async function (fastify: FastifyInstance) {
             message: "Libraries",
         };
     });
+
+    fastify.delete("/:id/serie", {}, async (request, reply) => {
+      return {
+        message: "",
+      };
+    });
 }
