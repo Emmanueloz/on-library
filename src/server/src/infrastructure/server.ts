@@ -6,41 +6,12 @@ import fastifySwaggerUi from "@fastify/swagger-ui";
 import fastifyStatic from "@fastify/static";
 import fastifyPrisma from "@joggr/fastify-prisma";
 import fastifyMultipart from "@fastify/multipart";
-
+import fastifyCors from "@fastify/cors";
 import { ClientPrisma } from "./services/client-prisma.ts";
 import { errorHandler } from "./http/errors/index.ts";
 import { DIRNAME_PROJECT, MEDIA_DIR } from "./constants/index.ts";
 import { join } from "node:path";
-import type { Readable } from "node:stream";
 
-declare module "fastify" {
-  interface FastifySchema {
-    consumes?: string[];
-    tags?: string[];
-    description?: string;
-    summary?: string;
-  }
-  interface FastifyRequest {
-    file(): Promise<{
-      file: Readable;
-      fieldname: string;
-      filename: string;
-      encoding: string;
-      mimetype: string;
-      fields: Record<string, { value: string }>;
-      toBuffer(): Promise<Buffer>;
-    }>;
-    parts(): AsyncIterable<{
-      type: "field" | "file";
-      fieldname?: string;
-      filename?: string;
-      value?: string;
-      mimetype?: string;
-      encoding?: string;
-      toBuffer(): Promise<Buffer>;
-    }>;
-  }
-}
 
 const fastifyMultipartOptions = {
   limits: {
@@ -50,6 +21,7 @@ const fastifyMultipartOptions = {
 };
 
 export async function buildServer(fastify: FastifyInstance) {
+  fastify.register(fastifyCors);
   fastify.register(fastifyMultipart, fastifyMultipartOptions);
 
   fastify.register(fastifySwagger);
