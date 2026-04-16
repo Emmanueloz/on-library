@@ -106,6 +106,40 @@ class PagesService {
       return "";
     }
   }
+
+  async createManyWithImages(params: {
+    idChapter: string;
+    pages: Array<{
+      pageNumber: number;
+      type: string;
+      fileName: string;
+      buffer: Buffer;
+    }>;
+    baseUrl?: string;
+  }): Promise<IPages[]> {
+    const createdPages: IPages[] = [];
+
+    for (const page of params.pages) {
+      const fileName = this.imageStorage.generateFileName(page.fileName);
+      const url = await this.imageStorage.saveImage({
+        folder: params.idChapter,
+        fileName,
+        buffer: page.buffer,
+        baseUrl: params.baseUrl,
+      });
+
+      const created = await this.pagesRepo.create({
+        idChapter: params.idChapter,
+        pageNumber: page.pageNumber,
+        type: page.type,
+        url,
+      });
+
+      createdPages.push(created);
+    }
+
+    return createdPages;
+  }
 }
 
 export { PagesService };
