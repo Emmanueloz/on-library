@@ -16,15 +16,24 @@ export default async function (fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const { title, description, author, publicationDate, idCategory } =
-        request.body;
+      const {
+        title,
+        pictureUrl,
+        description,
+        author,
+        publicationDate,
+        idCategory,
+        tags,
+      } = request.body;
 
       const series = await fastify.seriesService.create({
         title,
+        pictureUrl,
         description,
         author,
         publicationDate: new Date(publicationDate),
         idCategory,
+        tags: tags || [],
       });
 
       return {
