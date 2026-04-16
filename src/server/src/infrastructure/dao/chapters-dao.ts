@@ -28,6 +28,28 @@ class ChaptersDao implements IChaptersRepo {
 
       return await this.client.chapter.findMany({
         where: where,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          series: {
+            omit: {
+              author: true,
+              description: true,
+              idCategory: true,
+              createdAt: true,
+              publicationDate: true,
+            },
+            include: {
+              category: {
+                omit: {
+                  createdAt: true,
+                  id: true,
+                },
+              },
+            },
+          },
+        },
       });
     }
 
