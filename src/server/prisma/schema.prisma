@@ -22,25 +22,37 @@ model User {
 }
 
 model Libraries {
-  id        String   @id @default(cuid())
-  name      String
-  user      User     @relation(fields: [idUser], references: [id])
-  idUser    String
-  isPublic  Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id                String              @id @default(cuid())
+  name              String
+  user              User                @relation(fields: [idUser], references: [id])
+  idUser            String
+  isPublic          Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  librariesOnSeries LibrariesOnSeries[]
 }
 
 model Series {
-  id              String         @id @default(cuid())
-  title           String         @unique
-  description     String
-  author          String
-  createdAt       DateTime       @default(now())
-  publicationDate DateTime
-  category        Categories     @relation(fields: [idCategory], references: [id])
-  idCategory      String
-  chapters        Chapter[]
-  tagsOnSeries    TagsOnSeries[]
+  id                String              @id @default(cuid())
+  title             String              @unique
+  description       String
+  pictureUrl        String              @default("")
+  author            String
+  createdAt         DateTime            @default(now())
+  publicationDate   DateTime
+  category          Categories          @relation(fields: [idCategory], references: [id])
+  idCategory        String
+  chapters          Chapter[]
+  tagsOnSeries      TagsOnSeries[]
+  librariesOnSeries LibrariesOnSeries[]
+}
+
+model LibrariesOnSeries {
+  serie     Series    @relation(fields: [idSerie], references: [id])
+  idSerie   String
+  library   Libraries @relation(fields: [idLibrary], references: [id])
+  idLibrary String
+
+  @@id([idSerie, idLibrary])
 }
 
 model Categories {
