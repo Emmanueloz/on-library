@@ -14,6 +14,7 @@ import { PagesDao } from "../dao/pages-dao.ts";
 import { PagesService } from "../../application/features/pages/pages-service.ts";
 import { FilesystemImageStorage } from "../services/filesystem-image-storage.ts";
 import { MEDIA_DIR } from "../constants/index.ts";
+import type { LibrariesService } from "../../application/features/libraries/libraries-service.ts";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -22,6 +23,7 @@ declare module "fastify" {
     categoriesService: CategoriesServices;
     chaptersService: ChaptersService;
     pagesService: PagesService;
+    librariesService:LibrariesService;
   }
 }
 
