@@ -1,13 +1,13 @@
 import { Outlet } from "react-router";
-import { Drawer } from "../components/common/Drawer";
+import { Nav } from "../components/common/Nav";
 
 function Layout() {
   return (
-    <div className="flex grow w-screen">
-      <Drawer />
-      <div className="flex flex-col grow">
+    <div className="flex flex-col min-h-screen">
+      <Nav />
+      <main className="grow">
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 }
