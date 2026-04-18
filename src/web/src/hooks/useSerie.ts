@@ -1,5 +1,5 @@
 import type { ISeries } from "@on-library/shared";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { configEnv } from "../config";
 
 const useSerie = ({ id }: { id: string | undefined }) => {
@@ -7,30 +7,34 @@ const useSerie = ({ id }: { id: string | undefined }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorSerie, setErrorSerie] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`${configEnv.apiUrl}/api/series/${id}`);
-        const result = await res.json();
+  const fetchData = useCallback(async () => {
+    if (!id) return;
+    
+    setIsLoading(true);
+    setErrorSerie(null);
 
-        console.log(result);
+    try {
+      const res = await fetch(`${configEnv.apiUrl}/api/series/${id}`);
+      const result = await res.json();
 
-        setSerie(result.data);
-      } catch (error) {
-        setErrorSerie(`${error}`);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+      setSerie(result.data);
+    } catch (error) {
+      setErrorSerie(`${error}`);
+    } finally {
+      setIsLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return {
     isLoading,
     serie,
     setSerie,
     errorSerie,
+    refetch: fetchData,
   };
 };
 
