@@ -58,9 +58,6 @@ importers:
       '@prisma/client':
         specifier: 7.6.0
         version: 7.6.0(prisma@7.6.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3)
-      '@tutkli/jikan-ts':
-        specifier: 3.0.0
-        version: 3.0.0
       better-sqlite3:
         specifier: 12.8.0
         version: 12.8.0
@@ -104,6 +101,12 @@ importers:
       '@tailwindcss/vite':
         specifier: 4.2.2
         version: 4.2.2(vite@8.0.1(@types/node@24.12.0)(jiti@2.6.1)(yaml@2.8.3))
+      '@tutkli/jikan-ts':
+        specifier: 3.0.0
+        version: 3.0.0(ky@2.0.1)
+      ky:
+        specifier: 2.0.1
+        version: 2.0.1
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -2022,6 +2025,10 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
+  ky@2.0.1:
+    resolution: {integrity: sha512-HJPEjEpQPZQ5M3G5eu90/LWZDwysCnvqcfbLvq9FUvfizBZRi58WEixswyyI32LOLcFQd43w7kcfgkCPFxDt/Q==}
+    engines: {node: '>=22'}
+
   lazy-val@1.0.5:
     resolution: {integrity: sha512-0/BnGCCfyUMkBpeDgWihanIAF9JmZhHBgUhEqzvf+adhNGLoP6TaiI5oF8oyb3I45P+PcnrqihSf01M0l0G5+Q==}
 
@@ -3838,7 +3845,9 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@tutkli/jikan-ts@3.0.0': {}
+  '@tutkli/jikan-ts@3.0.0(ky@2.0.1)':
+    optionalDependencies:
+      ky: 2.0.1
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
@@ -5147,6 +5156,8 @@ snapshots:
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
+
+  ky@2.0.1: {}
 
   lazy-val@1.0.5: {}
 
