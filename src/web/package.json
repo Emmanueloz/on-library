@@ -12,6 +12,8 @@
   "dependencies": {
     "@on-library/shared": "workspace:*",
     "@tailwindcss/vite": "4.2.2",
+    "@tutkli/jikan-ts": "3.0.0",
+    "ky": "2.0.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-router": "7.14.0",
