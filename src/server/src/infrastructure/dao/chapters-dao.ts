@@ -29,7 +29,7 @@ class ChaptersDao implements IChaptersRepo {
       return await this.client.chapter.findMany({
         where: where,
         orderBy: {
-          createdAt: "desc",
+          number: "asc",
         },
         include: {
           series: {
