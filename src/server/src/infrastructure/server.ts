@@ -21,7 +21,7 @@ const fastifyMultipartOptions = {
 };
 
 export async function buildServer(fastify: FastifyInstance) {
-  fastify.register(fastifyCors);
+  fastify.register(fastifyCors,{methods: ["GET", "POST", "PUT", "DELETE"]});
   fastify.register(fastifyMultipart, fastifyMultipartOptions);
 
   fastify.register(fastifySwagger);
