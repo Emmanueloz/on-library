@@ -9,9 +9,13 @@ import fastifyMultipart from "@fastify/multipart";
 import fastifyCors from "@fastify/cors";
 import { ClientPrisma } from "./services/client-prisma.ts";
 import { errorHandler } from "./http/errors/index.ts";
-import { DIRNAME_PROJECT, MEDIA_DIR } from "./constants/index.ts";
-import { join } from "node:path";
+import { MEDIA_DIR } from "./constants/index.ts";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import authPlugin from "./plugins/auth.ts";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const INFRASTRUCTURE_PLUGINS_DIR = join(__dirname, "plugins");
 
 const fastifyMultipartOptions = {
   limits: {
@@ -21,10 +25,27 @@ const fastifyMultipartOptions = {
 };
 
 export async function buildServer(fastify: FastifyInstance) {
-  fastify.register(fastifyCors,{methods: ["GET", "POST", "PUT", "DELETE"]});
+  fastify.register(fastifyCors, { methods: ["GET", "POST", "PUT", "DELETE"] });
   fastify.register(fastifyMultipart, fastifyMultipartOptions);
 
-  fastify.register(fastifySwagger);
+  fastify.register(fastifySwagger, {
+    openapi: {
+      info: {
+        title: "OnLibrary API",
+        description: "API documentation for OnLibrary",
+        version: "0.0.0",
+      },
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
+          },
+        },
+      },
+    },
+  });
   fastify.register(fastifySwaggerUi, {
     routePrefix: "/documentation",
   });
@@ -41,13 +62,15 @@ export async function buildServer(fastify: FastifyInstance) {
     client: client,
   });
 
+  await fastify.register(authPlugin);
+
   fastify.register(fastifyAutoload, {
-    dir: join(DIRNAME_PROJECT, "plugins"),
+    dir: INFRASTRUCTURE_PLUGINS_DIR,
     forceESM: true,
   });
 
   fastify.register(fastifyAutoload, {
-    dir: join(DIRNAME_PROJECT, "http/routes"),
+    dir: join(__dirname, "http/routes"),
     routeParams: true,
     options: {
       prefix: "/api",
