@@ -13,8 +13,10 @@ export default async function (fastify: FastifyInstance) {
   }>(
     "/:id",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         tags: ["Series"],
+        security: [{ bearerAuth: [] }],
         params: SeriesSchema.Params.SerieId,
         body: UpdateSeriesBodySchema,
       },
