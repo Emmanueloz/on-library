@@ -14,7 +14,15 @@ import { PagesDao } from "../dao/pages-dao.ts";
 import { PagesService } from "../../application/features/pages/pages-service.ts";
 import { FilesystemImageStorage } from "../services/filesystem-image-storage.ts";
 import { MEDIA_DIR } from "../constants/index.ts";
-import type { LibrariesService } from "../../application/features/libraries/libraries-service.ts";
+import { LibrariesService } from "../../application/features/libraries/libraries-service.ts";
+import type { ILibrariesRepo } from "../../application/features/libraries/libraries-repo.ts";
+import { LibrariesDao } from "../dao/libraries-dao.ts";
+import { AuthService } from "../../application/features/auth/auth-service.ts";
+import type { IAuthRepo } from "../../application/features/auth/auth-repo.ts";
+import { AuthDao } from "../dao/auth-dao.ts";
+import { UsersService } from "../../application/features/users/users-service.ts";
+import type { IUsersRepo } from "../../application/features/users/users-repo.ts";
+import { UsersDao } from "../dao/users-dao.ts";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -23,7 +31,9 @@ declare module "fastify" {
     categoriesService: CategoriesServices;
     chaptersService: ChaptersService;
     pagesService: PagesService;
-    librariesService:LibrariesService;
+    librariesService: LibrariesService;
+    authService: AuthService;
+    usersService: UsersService;
   }
 }
 
@@ -44,9 +54,21 @@ export default fp(async (fastify: FastifyInstance) => {
   const pagesRepo = new PagesDao(fastify.prisma);
   const pagesService = new PagesService(pagesRepo, imageStorage);
 
+  const librariesRepo: ILibrariesRepo = new LibrariesDao(fastify.prisma);
+  const librariesService = new LibrariesService(librariesRepo);
+
+  const authRepo: IAuthRepo = new AuthDao(fastify.prisma);
+  const authService = new AuthService(authRepo);
+
+  const usersRepo: IUsersRepo = new UsersDao(fastify.prisma);
+  const usersService = new UsersService(usersRepo);
+
   fastify.decorate("seriesService", seriesService);
   fastify.decorate("tagsService", tagsService);
   fastify.decorate("categoriesService", categoriesService);
   fastify.decorate("chaptersService", chaptersService);
   fastify.decorate("pagesService", pagesService);
+  fastify.decorate("librariesService", librariesService);
+  fastify.decorate("authService", authService);
+  fastify.decorate("usersService", usersService);
 });
