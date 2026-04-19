@@ -12,30 +12,102 @@ class LibrariesDao implements ILibrariesRepo {
   async query(name: string): Promise<ILibraries[]> {
     return await this.client.libraries.findMany();
   }
+
   async getById(id: string): Promise<ILibraries | null> {
     return await this.client.libraries.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       include: {
         librariesOnSeries: true,
       },
     });
   }
+
+  async getByIdAndUserId(
+    id: string,
+    userId: string,
+  ): Promise<ILibraries | null> {
+    return await this.client.libraries.findFirst({
+      where: { id, idUser: userId },
+      include: {
+        librariesOnSeries: {
+          include: {
+            serie: {
+              include: {
+                category: true,
+                tagsOnSeries: {
+                  include: {
+                    tag: true,
+                  },
+                },
+                chapters: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getByUserId(userId: string): Promise<ILibraries[]> {
+    return await this.client.libraries.findMany({
+      where: { idUser: userId },
+    });
+  }
+
+  async existsSerie(idSerie: string): Promise<boolean> {
+    const serie = await this.client.series.findUnique({
+      where: { id: idSerie },
+    });
+    return !!serie;
+  }
+
   async create(library: Omit<ILibraries, "id">): Promise<ILibraries> {
-    throw new Error("Method not implemented.");
+    const created = await this.client.libraries.create({
+      data: {
+        name: library.name,
+        idUser: library.idUser,
+        isPublic: library.isPublic ?? false,
+      },
+    });
+    return created;
   }
-  async addSerie(id: string, idSerie: String): Promise<void> {
-    throw new Error("Method not implemented.");
+
+  async addSerie(id: string, idSerie: string): Promise<void> {
+    await this.client.librariesOnSeries.create({
+      data: {
+        idLibrary: id,
+        idSerie,
+      },
+    });
   }
+
+  async removeSerie(id: string, idSerie: string): Promise<void> {
+    await this.client.librariesOnSeries.delete({
+      where: {
+        idSerie_idLibrary: {
+          idSerie,
+          idLibrary: id,
+        },
+      },
+    });
+  }
+
   async update(
     id: string,
     library: Partial<ILibraries>,
   ): Promise<ILibraries | null> {
-    throw new Error("Method not implemented.");
+    const updated = await this.client.libraries.update({
+      where: { id },
+      data: {
+        ...(library.name && { name: library.name }),
+        ...(library.isPublic !== undefined && { isPublic: library.isPublic }),
+      },
+    });
+    return updated;
   }
+
   async delete(id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    await this.client.libraries.delete({ where: { id } });
   }
 }
 
