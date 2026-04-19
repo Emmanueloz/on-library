@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance} from "fastify";
 import { TagsSchema } from "../../schemas/tags/index.ts";
 import type { TagIdType } from "../../schemas/tags/params.ts";
 
@@ -8,8 +8,10 @@ export default async function (fastify: FastifyInstance) {
   }>(
     "/:id",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         tags: ["Tags"],
+        security: [{ bearerAuth: [] }],
         params: TagsSchema.Params.TagId,
       },
     },
