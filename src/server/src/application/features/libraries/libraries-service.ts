@@ -20,14 +20,26 @@ class LibrariesService {
   async addSerie(id: string, idSerie: String): Promise<void> {
     return await this.librariesRepo.addSerie(id, idSerie);
   }
+  async removeSerie(id: string, idSerie: String): Promise<void> {
+    return await this.librariesRepo.removeSerie(id, idSerie);
+  }
   async update(
     id: string,
     library: Partial<ILibraries>,
   ): Promise<ILibraries | null> {
-    return await this.update(id, library);
+    return await this.librariesRepo.update(id, library);
   }
   async delete(id: string): Promise<void> {
-    return await this.delete(id);
+    return await this.librariesRepo.delete(id);
+  }
+  async getByUserId(userId: string): Promise<ILibraries[]> {
+    return await this.librariesRepo.getByUserId(userId);
+  }
+  async getByIdAndUserId(id: string, userId: string): Promise<ILibraries | null> {
+    return await this.librariesRepo.getByIdAndUserId(id, userId);
+  }
+  async existsSerie(idSerie: string): Promise<boolean> {
+    return await this.librariesRepo.existsSerie(idSerie);
   }
 }
 
