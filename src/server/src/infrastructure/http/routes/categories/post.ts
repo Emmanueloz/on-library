@@ -10,8 +10,10 @@ export default async function (fastify: FastifyInstance) {
   }>(
     "/",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         tags: ["Categories"],
+        security: [{ bearerAuth: [] }],
         body: CreateCategoryBody,
       },
     },
