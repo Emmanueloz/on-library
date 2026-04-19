@@ -23,8 +23,10 @@ export default async function (fastify: FastifyInstance) {
   }>(
     "/",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         tags: ["Pages"],
+        security: [{ bearerAuth: [] }],
         consumes: ["multipart/form-data"],
       },
     },
@@ -70,8 +72,10 @@ export default async function (fastify: FastifyInstance) {
   }>(
     "/batch",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         tags: ["Pages"],
+        security: [{ bearerAuth: [] }],
         consumes: ["multipart/form-data"],
       },
     },

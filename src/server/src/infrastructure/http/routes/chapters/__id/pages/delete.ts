@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url";
 import { PageIdParams, type PageIdParamsType } from "../../../../schemas/pages/params.ts";
 import { ChapterIdParams, type ChapterIdParamsType } from "../../../../schemas/chapters/params.ts";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const MEDIA_DIR = join(__dirname, "../../../../../../../../media");
@@ -16,8 +15,10 @@ export default async function (fastify: FastifyInstance) {
   }>(
     "/:pageId",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         tags: ["Pages"],
+        security: [{ bearerAuth: [] }],
         params: {
           allOf: [PageIdParams, ChapterIdParams],
         },

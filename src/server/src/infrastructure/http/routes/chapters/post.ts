@@ -10,8 +10,10 @@ export default async function (fastify: FastifyInstance) {
   }>(
     "/",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         tags: ["Chapters"],
+        security: [{ bearerAuth: [] }],
         body: CreateChapterBodySchema,
       },
     },

@@ -11,7 +11,9 @@ export default async function (fastify: FastifyInstance) {
   }>(
     "/:pageId",
     {
+      onRequest: [fastify.authenticate],
       schema: {
+        security: [{ bearerAuth: [] }],
         tags: ["Pages"],
       },
     },
