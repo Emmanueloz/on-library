@@ -14,13 +14,14 @@ export default async function (fastify: FastifyInstance) {
       try {
         const { email, password } = request.body;
 
-        const result = await fastify.authService.login({ email, password });
-
-        const token = fastify.jwt.sign(result);
+        const { user, token } = await fastify.authService.login({
+          email,
+          password,
+        });
 
         return {
           token,
-          permissions: result.permissions,
+          user,
         };
       } catch (error: any) {
         return reply.status(401).send({ message: "Invalid credentials" });

@@ -1,6 +1,7 @@
 import type { IUser } from "@on-library/shared";
 import type { IAuthRepo } from "./auth-repo.ts";
 import type { IUserPayload } from "./user-payload.interface.ts";
+import type { ITokenService } from "./token-service.port.ts";
 
 interface RegisterInput {
   username: string;
@@ -13,21 +14,21 @@ interface LoginInput {
   password: string;
 }
 
-interface TokenPayload {
-  id: string;
-  email: string;
-  username: string;
-  permissions: Record<string, string[]>;
+interface ResultPayload {
+  user: IUserPayload;
+  token: string;
 }
 
 class AuthService {
-  private repo: IAuthRepo;
+  private readonly repo: IAuthRepo;
+  private readonly tokenService: ITokenService;
 
-  constructor(repo: IAuthRepo) {
+  constructor(repo: IAuthRepo, tokenService: ITokenService) {
     this.repo = repo;
+    this.tokenService = tokenService;
   }
 
-  async register(input: RegisterInput): Promise<IUserPayload> {
+  async register(input: RegisterInput): Promise<ResultPayload> {
     const existingUser = await this.repo.findByEmail(input.email);
     if (existingUser) {
       throw new Error("Email already registered");
@@ -39,7 +40,6 @@ class AuthService {
     }
 
     console.log("create");
-    
 
     const user = await this.repo.create({
       username: input.username,
@@ -47,25 +47,40 @@ class AuthService {
       password: input.password,
     });
 
-    return {
+    const payload = {
       id: user.id,
       email: user.email,
       username: user.username,
       permissions: this.getPermissions(user),
     };
+
+    const token = this.tokenService.generateToken(payload);
+
+    return {
+      user: payload,
+      token,
+    };
   }
 
-  async login(input: LoginInput): Promise<IUserPayload> {
+  async login(input: LoginInput): Promise<ResultPayload> {
     const user = await this.repo.findByEmail(input.email);
+
     if (!user || user.password !== input.password) {
       throw new Error("Invalid credentials");
     }
 
-    return {
+    const payload = {
       id: user.id,
       email: user.email,
       username: user.username,
       permissions: this.getPermissions(user),
+    };
+
+    const token = this.tokenService.generateToken(payload);
+
+    return {
+      user: payload,
+      token,
     };
   }
 
@@ -129,4 +144,4 @@ class AuthService {
 }
 
 export { AuthService };
-export type { RegisterInput, LoginInput, TokenPayload };
+export type { RegisterInput, LoginInput };
