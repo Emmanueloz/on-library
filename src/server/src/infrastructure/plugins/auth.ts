@@ -59,9 +59,13 @@ async function authPlugin(fastify: FastifyInstance) {
       const method = request.method;
 
       try {
+        fastify.log.info(`Authenticating request for URL: ${url}, method: ${method}`);
         const decoded = await request.jwtVerify<IUserPayload>();
 
         const module = extractModuleFromUrl(url);
+        fastify.log.info(
+          `Authenticating request for module: ${module}, method: ${method}`,
+        );
 
         if (module) {
           const requiredPermission = getRequiredPermission(method);
@@ -78,6 +82,7 @@ async function authPlugin(fastify: FastifyInstance) {
           }
         }
       } catch (err) {
+        fastify.log.error(`Authentication error: ${err}`);
         return reply.status(401).send({ message: "Unauthorized" });
       }
     },
