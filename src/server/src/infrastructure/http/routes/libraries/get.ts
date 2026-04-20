@@ -53,7 +53,7 @@ export default async function (fastify: FastifyInstance) {
             author: ls.serie.author,
             category: ls.serie.category?.name,
             tags: ls.serie.tagsOnSeries?.map((ts: any) => ts.tag.name),
-            chaptersCount: ls.serie.chapters?.length,
+            chaptersCount: ls.serie._count?.chapters || 0,
           })) || [],
       };
     },
