@@ -95,7 +95,7 @@ class AuthDao implements IAuthRepo {
     });
   }
 
-  async findAll(): Promise<IUser[]> {
+  async query(): Promise<IUser[]> {
     return await this.client.user.findMany({
       include: {
         userPermissions: {

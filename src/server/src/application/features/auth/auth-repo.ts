@@ -5,7 +5,7 @@ interface IAuthRepo {
   findById(id: string): Promise<IUser | null>;
   findByUsername(username: string): Promise<IUser | null>;
   create(user: Omit<IUser, "id" | "createdAt" | "libraries">): Promise<IUser>;
-  findAll(): Promise<IUser[]>;
+  query(): Promise<IUser[]>;
   update(id: string, user: Partial<IUser>): Promise<IUser | null>;
   delete(id: string): Promise<void>;
 }
