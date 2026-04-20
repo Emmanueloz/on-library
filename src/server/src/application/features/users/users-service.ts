@@ -1,5 +1,6 @@
 import type { IUser, ILibraries } from "@on-library/shared";
 import type { IUsersRepo } from "./users-repo.ts";
+import type { IUserPayload } from "../auth/user-payload.interface.ts";
 
 class UsersService {
   private repo: IUsersRepo;
@@ -8,19 +9,13 @@ class UsersService {
     this.repo = repo;
   }
 
-  async findAll(): Promise<IUserWithPermissions[]> {
-    const users = await this.repo.findAll();
+  async query(): Promise<IUserPayload[]> {
+    const users = await this.repo.query();
     return users.map((user) => this.mapUserWithPermissions(user));
   }
 
-  async findById(id: string): Promise<IUserWithPermissions | null> {
+  async findById(id: string): Promise<IUserPayload | null> {
     const user = await this.repo.findById(id);
-    if (!user) return null;
-    return this.mapUserWithPermissions(user);
-  }
-
-  async update(id: string, data: Partial<IUser>): Promise<IUserWithPermissions | null> {
-    const user = await this.repo.update(id, data);
     if (!user) return null;
     return this.mapUserWithPermissions(user);
   }
@@ -33,11 +28,18 @@ class UsersService {
     return this.repo.getPermissionsByUserId(userId);
   }
 
-  async setPermissions(
+  async updatePermissions(
     userId: string,
-    permissions: Array<{ module: string; type: string }>
+    permissions: Array<{ module: string; type: string }>,
   ): Promise<void> {
-    return this.repo.setPermissions(userId, permissions);
+    return this.repo.updatePermissions(userId, permissions);
+  }
+
+  async deletePermissions(
+    userId: string,
+    permissions: Array<{ module: string; type: string }>,
+  ): Promise<void> {
+    return this.repo.deletePermissions(userId, permissions);
   }
 
   async getLibraries(userId: string): Promise<ILibraries[]> {
@@ -52,7 +54,7 @@ class UsersService {
     await this.repo.delete(userId);
   }
 
-  private mapUserWithPermissions(user: IUser): IUserWithPermissions {
+  private mapUserWithPermissions(user: IUser): IUserPayload {
     const permissions: Record<string, string[]> = {};
     for (const up of user.userPermissions || []) {
       const moduleName = up.permission.name;
@@ -66,19 +68,9 @@ class UsersService {
       id: user.id,
       username: user.username,
       email: user.email,
-      createdAt: user.createdAt || new Date(),
       permissions,
     };
   }
 }
 
-interface IUserWithPermissions {
-  id: string;
-  username: string;
-  email: string;
-  createdAt?: Date;
-  permissions: Record<string, string[]>;
-}
-
 export { UsersService };
-export type { IUserWithPermissions };

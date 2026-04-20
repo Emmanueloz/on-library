@@ -9,7 +9,7 @@ class UsersDao implements IUsersRepo {
     this.client = client;
   }
 
-  async findAll(): Promise<IUser[]> {
+  async query(): Promise<IUser[]> {
     return await this.client.user.findMany({
       include: {
         userPermissions: {
@@ -35,36 +35,6 @@ class UsersDao implements IUsersRepo {
     });
   }
 
-  async update(id: string, data: Partial<IUser>): Promise<IUser | null> {
-    const user = await this.client.user.update({
-      where: { id },
-      data: {
-        ...(data.username && { username: data.username }),
-        ...(data.email && { email: data.email }),
-        ...(data.password && { password: data.password }),
-      },
-      include: {
-        userPermissions: {
-          include: {
-            permission: true,
-          },
-        },
-      },
-    });
-
-    if (!user) return null;
-
-    return {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      password: user.password,
-      createdAt: user.createdAt,
-      libraries: [],
-      userPermissions: user.userPermissions,
-    };
-  }
-
   async resetPassword(userId: string, newPassword: string): Promise<void> {
     await this.client.user.update({
       where: { id: userId },
@@ -72,7 +42,9 @@ class UsersDao implements IUsersRepo {
     });
   }
 
-  async getPermissionsByUserId(userId: string): Promise<Record<string, string[]>> {
+  async getPermissionsByUserId(
+    userId: string,
+  ): Promise<Record<string, string[]>> {
     const user = await this.client.user.findUnique({
       where: { id: userId },
       include: {
@@ -96,18 +68,14 @@ class UsersDao implements IUsersRepo {
         acc[moduleName].push(permType);
         return acc;
       },
-      {} as Record<string, string[]>
+      {} as Record<string, string[]>,
     );
   }
 
-  async setPermissions(
+  async updatePermissions(
     userId: string,
-    permissions: Array<{ module: string; type: string }>
+    permissions: Array<{ module: string; type: string }>,
   ): Promise<void> {
-    await this.client.userPermissions.deleteMany({
-      where: { idUser: userId },
-    });
-
     const orConditions = permissions.map((p) => ({
       name: p.module,
       type: p.type as "READ" | "WRITE" | "DELETE",
@@ -124,6 +92,31 @@ class UsersDao implements IUsersRepo {
         idUser: userId,
         idPermission: p.id,
       })),
+    });
+  }
+
+  async deletePermissions(
+    userId: string,
+    permissions: Array<{ module: string; type: string }>,
+  ): Promise<void> {
+    const orConditions = permissions.map((p) => ({
+      name: p.module,
+      type: p.type as "READ" | "WRITE" | "DELETE",
+    }));
+
+    const permissionRecords = await this.client.permissions.findMany({
+      where: {
+        OR: orConditions,
+      },
+    });
+
+    await this.client.userPermissions.deleteMany({
+      where: {
+        idUser: userId,
+        idPermission: {
+          in: permissionRecords.map((p) => p.id),
+        },
+      },
     });
   }
 

@@ -1,23 +1,13 @@
 import type { FastifyInstance } from "fastify";
-import { UserId, type UserIdType } from "../../schemas/users/params.ts";
+import {
+  DeletePermissionsBody,
+  UserId,
+  type DeletePermissionsBodyType,
+  type UserIdType,
+} from "../../schemas/users/params.ts";
 
 export default async function (fastify: FastifyInstance) {
-  fastify.get<{ Params: UserIdType }>(
-    "/",
-    {
-      onRequest: [fastify.authenticate],
-      schema: {
-        tags: ["Users"],
-        security: [{ bearerAuth: [] }],
-      },
-    },
-    async (request, reply) => {
-      const users = await fastify.usersService.query();
-      return users;
-    },
-  );
-
-  fastify.get<{ Params: UserIdType }>(
+  fastify.delete<{ Params: UserIdType }>(
     "/:id",
     {
       onRequest: [fastify.authenticate],
@@ -35,18 +25,21 @@ export default async function (fastify: FastifyInstance) {
         return reply.status(404).send({ message: "User not found" });
       }
 
-      return user;
+      await fastify.usersService.delete(id);
+
+      return reply.status(204).send();
     },
   );
 
-  fastify.get<{ Params: UserIdType }>(
-    "/:id/libraries",
+  fastify.delete<{ Params: UserIdType; Body: DeletePermissionsBodyType }>(
+    "/:id/permissions",
     {
       onRequest: [fastify.authenticate],
       schema: {
         tags: ["Users"],
         security: [{ bearerAuth: [] }],
         params: UserId,
+        body: DeletePermissionsBody,
       },
     },
     async (request, reply) => {
@@ -57,9 +50,9 @@ export default async function (fastify: FastifyInstance) {
         return reply.status(404).send({ message: "User not found" });
       }
 
-      const libraries = await fastify.usersService.getLibraries(id);
+      await fastify.usersService.deletePermissions(id, request.body.permissions);
 
-      return libraries;
+      return reply.status(204).send();
     },
   );
 }

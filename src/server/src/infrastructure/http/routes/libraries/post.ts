@@ -1,6 +1,16 @@
 import type { FastifyInstance } from "fastify";
-import { CreateLibraryBody, type CreateLibraryBodyType } from "../../schemas/libraries/body.ts";
-import { AddSeriesBody, type AddSeriesBodyType } from "../../schemas/libraries/body.ts";
+import {
+  CreateLibraryBody,
+  type CreateLibraryBodyType,
+} from "../../schemas/libraries/body.ts";
+import {
+  AddSeriesBody,
+  type AddSeriesBodyType,
+} from "../../schemas/libraries/body.ts";
+import {
+  LibraryId,
+  type LibraryIdType,
+} from "../../schemas/libraries/params.ts";
 
 export default async function (fastify: FastifyInstance) {
   fastify.post<{ Body: CreateLibraryBodyType }>(
@@ -24,15 +34,17 @@ export default async function (fastify: FastifyInstance) {
       });
 
       return reply.status(201).send(library);
-    }
+    },
   );
 
-  fastify.post<{ Params: { id: string }; Body: AddSeriesBodyType }>(
+  fastify.post<{ Params: LibraryIdType; Body: AddSeriesBodyType }>(
     "/:id/serie",
     {
       onRequest: [fastify.authenticate],
       schema: {
         tags: ["Libraries"],
+        security: [{ bearerAuth: [] }],
+        params: LibraryId,
         body: AddSeriesBody,
       },
     },
