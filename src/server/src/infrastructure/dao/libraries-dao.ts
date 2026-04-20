@@ -26,26 +26,41 @@ class LibrariesDao implements ILibrariesRepo {
     id: string,
     userId: string,
   ): Promise<ILibraries | null> {
-    return await this.client.libraries.findFirst({
+    const libraries = await this.client.libraries.findUnique({
       where: { id, idUser: userId },
       include: {
         librariesOnSeries: {
-          include: {
+          select: {
             serie: {
-              include: {
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                pictureUrl: true,
+                author: true,
+                publicationDate: true,
                 category: true,
                 tagsOnSeries: {
-                  include: {
-                    tag: true,
+                  select: {
+                    tag: {
+                      select: {
+                        name: true,
+                      },
+                    },
                   },
                 },
-                chapters: true,
+                // Aquí realizamos el conteo
+                _count: {
+                  select: { chapters: true },
+                },
               },
             },
           },
         },
       },
     });
+
+    return libraries;
   }
 
   async getByUserId(userId: string): Promise<ILibraries[]> {
