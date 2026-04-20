@@ -1,7 +1,12 @@
-import type { FastifyInstance} from "fastify";
+import type { FastifyInstance } from "fastify";
+import {
+  LibraryIdAndSerieId,
+  type LibraryIdAndSerieIdType,
+  type LibraryIdType,
+} from "../../schemas/libraries/params.ts";
 
 export default async function (fastify: FastifyInstance) {
-  fastify.delete<{ Params: { id: string } }>(
+  fastify.delete<{ Params: LibraryIdType }>(
     "/:id",
     {
       onRequest: [fastify.authenticate],
@@ -10,7 +15,7 @@ export default async function (fastify: FastifyInstance) {
         security: [{ bearerAuth: [] }],
       },
     },
-    async (request, reply ) => {
+    async (request, reply) => {
       const userId = request.user.id;
       const { id } = request.params;
 
@@ -31,12 +36,13 @@ export default async function (fastify: FastifyInstance) {
     },
   );
 
-  fastify.delete<{ Params: { id: string; idSerie: string } }>(
+  fastify.delete<{ Params: LibraryIdAndSerieIdType }>(
     "/:id/serie/:idSerie",
     {
       onRequest: [fastify.authenticate],
       schema: {
         tags: ["Libraries"],
+        params: LibraryIdAndSerieId,
         security: [{ bearerAuth: [] }],
       },
     },

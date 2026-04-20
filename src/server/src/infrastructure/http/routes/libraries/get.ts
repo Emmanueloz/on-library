@@ -1,4 +1,8 @@
 import type { FastifyInstance } from "fastify";
+import {
+  LibraryId,
+  type LibraryIdType,
+} from "../../schemas/libraries/params.ts";
 
 export default async function (fastify: FastifyInstance) {
   fastify.get(
@@ -17,12 +21,13 @@ export default async function (fastify: FastifyInstance) {
     },
   );
 
-  fastify.get<{ Params: { id: string } }>(
+  fastify.get<{ Params: LibraryIdType }>(
     "/:id",
     {
       onRequest: [fastify.authenticate],
       schema: {
         tags: ["Libraries"],
+        params: LibraryId,
         security: [{ bearerAuth: [] }],
       },
     },
