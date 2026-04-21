@@ -1,5 +1,6 @@
 import { PrismaClient } from "../prisma/prisma-client/client.ts";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { BcryptService } from "../src/infrastructure/security/bcryptService.ts";
 
 const prisma = new PrismaClient({
   adapter: new PrismaBetterSqlite3({
@@ -7,7 +8,16 @@ const prisma = new PrismaClient({
   }),
 });
 
-const modules = ["categories", "chapters", "libraries", "series", "tags", "users"];
+const encryptionService = new BcryptService();
+
+const modules = [
+  "categories",
+  "chapters",
+  "libraries",
+  "series",
+  "tags",
+  "users",
+];
 const permissionTypes = ["READ", "WRITE", "DELETE"] as const;
 
 async function main() {
@@ -23,7 +33,10 @@ async function main() {
         });
       } catch (e: any) {
         if (e.code !== "P2002") {
-          console.error(`Error creating permission ${module}/${type}:`, e.message);
+          console.error(
+            `Error creating permission ${module}/${type}:`,
+            e.message,
+          );
         }
       }
     }
@@ -45,7 +58,7 @@ async function main() {
       data: {
         username: "admin",
         email: "admin@onlibrary.com",
-        password: "Admin123!",
+        password: await encryptionService.hashPassword("Admin123!"),
         userPermissions: {
           create: adminPermissions,
         },

@@ -24,6 +24,7 @@ import { UsersService } from "../../application/features/users/users-service.ts"
 import type { IUsersRepo } from "../../application/features/users/users-repo.ts";
 import { UsersDao } from "../dao/users-dao.ts";
 import { JwtService } from "../security/JwtService.ts";
+import { BcryptService } from "../security/bcryptService.ts";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -60,10 +61,11 @@ export default fp(async (fastify: FastifyInstance) => {
 
   const authRepo: IAuthRepo = new AuthDao(fastify.prisma);
   const tokenService = new JwtService(fastify);
-  const authService = new AuthService(authRepo, tokenService);
+  const encryptService = new BcryptService();
+  const authService = new AuthService(authRepo, tokenService, encryptService);
 
   const usersRepo: IUsersRepo = new UsersDao(fastify.prisma);
-  const usersService = new UsersService(usersRepo);
+  const usersService = new UsersService(usersRepo, encryptService);
 
   fastify.decorate("seriesService", seriesService);
   fastify.decorate("tagsService", tagsService);

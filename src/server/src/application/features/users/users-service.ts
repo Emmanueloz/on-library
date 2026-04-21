@@ -1,12 +1,16 @@
 import type { IUser, ILibraries } from "@on-library/shared";
 import type { IUsersRepo } from "./users-repo.ts";
 import type { IUserPayload } from "../auth/user-payload.interface.ts";
+import type { EncryptService } from "../auth/encrypt-service.port.ts";
 
 class UsersService {
-  private repo: IUsersRepo;
+  private readonly repo: IUsersRepo;
+  private readonly encryptService: EncryptService;
 
-  constructor(repo: IUsersRepo) {
+  constructor(repo: IUsersRepo, encryptService: EncryptService) {
     this.repo = repo;
+    this.encryptService = encryptService;
+
   }
 
   async query(): Promise<IUserPayload[]> {
@@ -21,7 +25,8 @@ class UsersService {
   }
 
   async resetPassword(userId: string, newPassword: string): Promise<void> {
-    return this.repo.resetPassword(userId, newPassword);
+    const hashedPassword = await this.encryptService.hashPassword(newPassword);
+    return this.repo.resetPassword(userId, hashedPassword);
   }
 
   async getPermissions(userId: string): Promise<Record<string, string[]>> {

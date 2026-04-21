@@ -2,6 +2,7 @@ import type { IUser } from "@on-library/shared";
 import type { IAuthRepo } from "./auth-repo.ts";
 import type { IUserPayload } from "./user-payload.interface.ts";
 import type { ITokenService } from "./token-service.port.ts";
+import type { EncryptService } from "./encrypt-service.port.ts";
 
 interface RegisterInput {
   username: string;
@@ -22,10 +23,16 @@ interface ResultPayload {
 class AuthService {
   private readonly repo: IAuthRepo;
   private readonly tokenService: ITokenService;
+  private readonly encryptService: EncryptService;
 
-  constructor(repo: IAuthRepo, tokenService: ITokenService) {
+  constructor(
+    repo: IAuthRepo,
+    tokenService: ITokenService,
+    encryptService: EncryptService,
+  ) {
     this.repo = repo;
     this.tokenService = tokenService;
+    this.encryptService = encryptService;
   }
 
   async register(input: RegisterInput): Promise<ResultPayload> {
@@ -41,10 +48,14 @@ class AuthService {
 
     console.log("create");
 
+    const hashedPassword = await this.encryptService.hashPassword(
+      input.password,
+    );
+
     const user = await this.repo.create({
       username: input.username,
       email: input.email,
-      password: input.password,
+      password: hashedPassword,
     });
 
     const payload = {
@@ -65,7 +76,13 @@ class AuthService {
   async login(input: LoginInput): Promise<ResultPayload> {
     const user = await this.repo.findByEmail(input.email);
 
-    if (!user || user.password !== input.password) {
+    if (
+      !user ||
+      !(await this.encryptService.comparePassword(
+        input.password,
+        user.password,
+      ))
+    ) {
       throw new Error("Invalid credentials");
     }
 
@@ -118,10 +135,14 @@ class AuthService {
     newPassword: string,
   ): Promise<boolean> {
     const user = await this.repo.findById(userId);
-    if (!user || user.password !== oldPassword) {
+    if (
+      !user ||
+      !(await this.encryptService.comparePassword(oldPassword, user.password))
+    ) {
       return false;
     }
-    await this.repo.update(userId, { password: newPassword });
+    const hashedPassword = await this.encryptService.hashPassword(newPassword);
+    await this.repo.update(userId, { password: hashedPassword });
     return true;
   }
 
