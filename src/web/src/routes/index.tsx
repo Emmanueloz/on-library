@@ -7,8 +7,8 @@ import { Library } from "../app/Library";
 import { Titles } from "../app/Titles";
 import { Tags } from "../app/dashboard/Tags";
 import { Categories } from "../app/dashboard/Categories";
-import { SignIn } from "../app/auth/SignIn";
-import { SignUp } from "../app/auth/SignUp";
+import { Login } from "../app/auth/Login";
+import { Register } from "../app/auth/Register";
 import { ContentIndex } from "../app/dashboard/content";
 import { CreateSerie } from "../app/dashboard/content/create";
 import { EditSerie } from "../app/dashboard/content/serie";
@@ -16,10 +16,12 @@ import { EditChapter } from "../app/dashboard/content/chapter";
 import { DashboardLayout } from "../app/dashboard/__DashboardLayout";
 import { Dashboard } from "../app/dashboard";
 import { Profile } from "../app/auth/Profile";
+import { AuthProvider } from "../context/AuthContex";
+import { AuthLayout } from "../app/auth/__AuthLayout";
 
 function AppRouter() {
   return (
-    <>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -41,17 +43,17 @@ function AppRouter() {
               <Route path="tags" element={<Tags />} />
               <Route path="categories" element={<Categories />} />
             </Route>
-          </Route>
-          <Route path="auth">
-            <Route path="login" element={<SignIn />} />
-            <Route path="register" element={<SignUp />} />
-            <Route path="profile" element={<Layout />}>
-              <Route index element={<Profile />} />
+            <Route path="auth" element={<AuthLayout />}>
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+              <Route path="profile">
+                <Route index element={<Profile />} />
+              </Route>
             </Route>
           </Route>
         </Routes>
       </BrowserRouter>
-    </>
+    </AuthProvider>
   );
 }
 export { AppRouter };
