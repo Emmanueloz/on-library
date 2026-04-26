@@ -1,16 +1,27 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { configEnv } from "../config";
 import type { ITags } from "@on-library/shared";
+import { AuthContext } from "../context/AuthContex";
+import { buildAuthHeaders } from "../utils/buildAuthHeaders";
 
 const useTags = () => {
   const [tags, setTags] = useState<ITags[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorTags, setErrorTags] = useState<string | null>(null);
 
+  const authContext = use(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is not available");
+  }
+  const { token, isAuthenticated } = authContext;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${configEnv.apiUrl}/api/tags/`);
+        const headers = buildAuthHeaders(token, isAuthenticated());
+        const res = await fetch(`${configEnv.apiUrl}/api/tags/`, {
+          headers,
+        });
         const result = await res.json();
 
         setTags(result.data || []);
@@ -22,15 +33,14 @@ const useTags = () => {
     };
 
     fetchData();
-  }, []);
+  }, [token, isAuthenticated]);
 
   const addTag = async (tag: Partial<ITags>) => {
     try {
+      const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(`${configEnv.apiUrl}/api/tags/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({
           name: tag.name,
         }),
@@ -53,13 +63,12 @@ const useTags = () => {
     updatedTag: Partial<ITags>,
   ) => {
     try {
+      const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(
         `${configEnv.apiUrl}/api/tags/${tagId}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify({
             name: updatedTag.name,
           }),
@@ -85,10 +94,12 @@ const useTags = () => {
 
   const deleteTag = async (tagId: string) => {
     try {
+      const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(
         `${configEnv.apiUrl}/api/tags/${tagId}`,
         {
           method: "DELETE",
+          headers,
         },
       );
 

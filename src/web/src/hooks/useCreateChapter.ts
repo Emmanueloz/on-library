@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { configEnv } from "../config";
+import { AuthContext } from "../context/AuthContex";
+import { buildAuthHeaders } from "../utils/buildAuthHeaders";
 
 interface CreateChapterData {
   title: string;
@@ -12,14 +14,21 @@ const useCreateChapter = () => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<{ id: string } | null>(null);
 
+  const authContext = use(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is not available");
+  }
+  const { token, isAuthenticated } = authContext;
+
   const createChapter = async (chapterData: CreateChapterData) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(`${configEnv.apiUrl}/api/chapters/`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(chapterData),
       });
 

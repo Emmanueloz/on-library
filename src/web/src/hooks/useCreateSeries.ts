@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { configEnv } from "../config";
+import { AuthContext } from "../context/AuthContex";
+import { buildAuthHeaders } from "../utils/buildAuthHeaders";
 
 interface CreateSeriesData {
   title: string;
@@ -16,14 +18,21 @@ const useCreateSeries = () => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<{ id: string } | null>(null);
 
+  const authContext = use(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is not available");
+  }
+  const { token, isAuthenticated } = authContext;
+
   const createSeries = async (seriesData: CreateSeriesData) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(`${configEnv.apiUrl}/api/series/`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(seriesData),
       });
 

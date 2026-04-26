@@ -1,16 +1,27 @@
 import type { IChapter } from "@on-library/shared";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { configEnv } from "../config";
+import { AuthContext } from "../context/AuthContex";
+import { buildAuthHeaders } from "../utils/buildAuthHeaders";
 
 const useChapters = () => {
   const [chapters, setChapters] = useState<IChapter[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorChapters, setErrorChapters] = useState<string | null>(null);
 
+  const authContext = use(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is not available");
+  }
+  const { token, isAuthenticated } = authContext;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${configEnv.apiUrl}/api/chapters/`);
+        const headers = buildAuthHeaders(token, isAuthenticated());
+        const res = await fetch(`${configEnv.apiUrl}/api/chapters/`, {
+          headers,
+        });
         const result = await res.json();
 
         console.log(result);
@@ -24,7 +35,7 @@ const useChapters = () => {
     };
 
     fetchData();
-  }, []);
+  }, [token, isAuthenticated]);
 
   return {
     isLoading,

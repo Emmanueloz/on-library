@@ -1,16 +1,33 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { configEnv } from "../config";
 import type { ICategories } from "@on-library/shared";
+import { AuthContext } from "../context/AuthContex";
+import { buildAuthHeaders } from "../utils/buildAuthHeaders";
 
 const useCategories = () => {
   const [categories, setCategories] = useState<ICategories[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorCategories, setErrorCategories] = useState<string | null>(null);
 
+  const authContext = use(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is not available");
+  }
+  const { token, isAuthenticated } = authContext;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`${configEnv.apiUrl}/api/categories/`);
+        const headers = buildAuthHeaders(token, isAuthenticated());
+        const fetchOptions: RequestInit = {
+          method: "GET",
+          headers,
+        };
+
+        const res = await fetch(
+          `${configEnv.apiUrl}/api/categories/`,
+          fetchOptions,
+        );
         const result = await res.json();
 
         console.log(result);
@@ -25,15 +42,14 @@ const useCategories = () => {
     };
 
     fetchData();
-  }, []);
+  }, [token, isAuthenticated]);
 
   const addCategory = async (category: ICategories) => {
     try {
+      const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(`${configEnv.apiUrl}/api/categories/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({
           name: category.name,
         }),
@@ -56,13 +72,12 @@ const useCategories = () => {
     updatedCategory: ICategories,
   ) => {
     try {
+      const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(
         `${configEnv.apiUrl}/api/categories/${categoryId}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify({
             name: updatedCategory.name,
           }),
@@ -87,13 +102,13 @@ const useCategories = () => {
   };
 
   const deleteCategory = async (categoryId: string) => {
-    console.log(categoryId);
-
     try {
+      const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(
         `${configEnv.apiUrl}/api/categories/${categoryId}`,
         {
           method: "DELETE",
+          headers,
         },
       );
 
