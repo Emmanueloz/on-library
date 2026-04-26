@@ -1,0 +1,1 @@
+export type {PermissionsPayload} from "./permissions-payload.ts"
