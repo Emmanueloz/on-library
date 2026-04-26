@@ -39,7 +39,7 @@ export default async function (fastify: FastifyInstance) {
       if (pictureUrl) data.pictureUrl = pictureUrl;
       if (description) data.description = description;
       if (author) data.author = author;
-      if (publicationDate) data.publicationDate = publicationDate;
+      if (publicationDate) data.publicationDate = new Date(publicationDate);
       if (idCategory) data.idCategory = idCategory;
       if (tags) data.tags = tags;
 
