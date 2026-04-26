@@ -31,5 +31,5 @@
   },
   "include": [
     "src"
-  ]
+, "../../shared/enums/permisions.ts"  ]
 }
