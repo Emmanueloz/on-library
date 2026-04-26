@@ -1,6 +1,5 @@
-import type { IUser } from "@on-library/shared";
+import type { IUser, IUserPayload } from "@on-library/shared";
 import type { IAuthRepo } from "./auth-repo.ts";
-import type { IUserPayload } from "./user-payload.interface.ts";
 import type { ITokenService } from "./token-service.port.ts";
 import type { EncryptService } from "./encrypt-service.port.ts";
 

@@ -1,4 +1,4 @@
-import type { IUserPayload } from "./user-payload.interface.ts";
+import type { IUserPayload } from "@on-library/shared";
 
 interface ITokenService {
   generateToken(payload: IUserPayload, expiresIn?: string | number): string;

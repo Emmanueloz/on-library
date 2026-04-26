@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ITokenService } from "../../application/features/auth/token-service.port.ts";
-import type { IUserPayload } from "../../application/features/auth/user-payload.interface.ts";
+import type { IUserPayload } from "@on-library/shared";
 
 class JwtService implements ITokenService {
   private readonly fastify: FastifyInstance;

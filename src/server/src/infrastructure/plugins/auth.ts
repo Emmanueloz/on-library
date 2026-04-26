@@ -1,8 +1,7 @@
 import fp from "fastify-plugin";
 import fastifyJwt from "@fastify/jwt";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import type { IUser } from "@on-library/shared";
-import type { IUserPayload } from "../../application/features/auth/user-payload.interface.ts";
+import type { IUser, IUserPayload } from "@on-library/shared";
 import { config } from "../../config/index.ts";
 
 declare module "@fastify/jwt" {
