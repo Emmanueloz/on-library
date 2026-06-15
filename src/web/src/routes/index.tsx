@@ -3,7 +3,7 @@ import { Home } from "../app/Home";
 import { Serie } from "../app/Serie";
 import { Chapter } from "../app/Chapter";
 import { Layout } from "../app/__Layout";
-import { Library } from "../app/Library";
+import { Library } from "../app/library/Library";
 import { Titles } from "../app/Titles";
 import { Tags } from "../app/dashboard/Tags";
 import { Categories } from "../app/dashboard/Categories";
@@ -11,13 +11,14 @@ import { Login } from "../app/auth/Login";
 import { Register } from "../app/auth/Register";
 import { ContentIndex } from "../app/dashboard/content";
 import { CreateSerie } from "../app/dashboard/content/create";
-import { EditSerie } from "../app/dashboard/content/serie";
-import { EditChapter } from "../app/dashboard/content/chapter";
 import { DashboardLayout } from "../app/dashboard/__DashboardLayout";
 import { Dashboard } from "../app/dashboard";
 import { Profile } from "../app/auth/Profile";
 import { AuthProvider } from "../context/AuthContex";
 import { AuthLayout } from "../app/auth/__AuthLayout";
+import { Libraries } from "../app/library/Libraries";
+import { EditSerie } from "../app/dashboard/content/serie";
+import { EditChapter } from "../app/dashboard/content/chapter";
 
 function AppRouter() {
   return (
@@ -26,7 +27,10 @@ function AppRouter() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="library" element={<Library />} />
+            <Route path="libraries">
+              <Route index element={<Libraries />} />
+              <Route path=":id" element={<Library />} />
+            </Route>
             <Route path="titles" element={<Titles />} />
             <Route path="serie">
               <Route path=":id" element={<Serie />} />
