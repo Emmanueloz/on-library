@@ -23,7 +23,7 @@ export function Nav() {
             Home
           </Link>
           <Link
-            to="/library"
+            to="/libraries"
             className="text-medium-gray hover:text-white transition-opacity duration-200 text-sm font-medium"
           >
             Library
