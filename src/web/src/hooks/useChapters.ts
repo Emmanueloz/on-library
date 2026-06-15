@@ -19,9 +19,12 @@ const useChapters = () => {
     const fetchData = async () => {
       try {
         const headers = buildAuthHeaders(token, isAuthenticated());
-        const res = await fetch(`${configEnv.apiUrl}/api/chapters/`, {
-          headers,
-        });
+        const res = await fetch(
+          `${configEnv.apiUrl}/api/chapters/?orderBy=createdAt&orderType=desc`,
+          {
+            headers,
+          },
+        );
         const result = await res.json();
 
         console.log(result);
