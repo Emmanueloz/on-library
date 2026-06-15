@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTags } from "../../hooks/useTags";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
 
 function Tags() {
   const { tags, errorTags, isLoading, addTag, updateTag, deleteTag } =
@@ -67,13 +68,12 @@ function Tags() {
           <h1 className="text-2xl font-semibold text-foreground">Tags</h1>
           <p className="text-sm text-medium-gray">Manage your tags</p>
         </div>
-        <button
+        <PrimaryButton
           onClick={handleAddTag}
           disabled={isAdding || isEditing !== null}
-          className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded hover:brightness-110 transition-all disabled:opacity-50"
         >
           + New Tag
-        </button>
+        </PrimaryButton>
       </div>
 
       {errorTags && <p className="text-primary text-sm">{errorTags}</p>}
@@ -110,12 +110,9 @@ function Tags() {
                       </td>
                       <td className="px-3 py-2 text-right">
                         <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={handleUpdateTag}
-                            className="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded hover:brightness-110 transition-all"
-                          >
+                          <PrimaryButton onClick={handleUpdateTag}>
                             Save
-                          </button>
+                          </PrimaryButton>
                           <button
                             onClick={() => setIsEditing(null)}
                             className="px-3 py-1.5 text-medium-gray text-xs hover:text-white transition-colors"

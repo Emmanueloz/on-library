@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCategories } from "../../hooks/useCategories";
+import { PrimaryButton } from "../../components/common/PrimaryButton";
 
 function Categories() {
   const {
@@ -73,13 +74,12 @@ function Categories() {
           <h1 className="text-2xl font-semibold text-foreground">Categories</h1>
           <p className="text-sm text-medium-gray">Manage your categories</p>
         </div>
-        <button
+        <PrimaryButton
           onClick={handleAddCategory}
           disabled={isAdding || isEditing !== null}
-          className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded hover:brightness-110 transition-all disabled:opacity-50"
         >
           + New Category
-        </button>
+        </PrimaryButton>
       </div>
 
       {errorCategories && (
@@ -118,12 +118,9 @@ function Categories() {
                       </td>
                       <td className="px-3 py-2 text-right">
                         <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={handleUpdateCategory}
-                            className="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded hover:brightness-110 transition-all"
-                          >
+                          <PrimaryButton onClick={handleUpdateCategory}>
                             Save
-                          </button>
+                          </PrimaryButton>
                           <button
                             onClick={() => setIsEditing(null)}
                             className="px-3 py-1.5 text-medium-gray text-xs hover:text-white transition-colors"

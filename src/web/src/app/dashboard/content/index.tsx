@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { useSeries } from "../../../hooks/useSeries";
+import { PrimaryLink } from "../../../components/common/PrimaryLink";
 
 function ContentIndex() {
   const { series, isLoading } = useSeries();
@@ -16,15 +17,14 @@ function ContentIndex() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Content Management</h1>
-          <p className="text-sm text-medium-gray">Manage your series and chapters</p>
+          <h1 className="text-2xl font-semibold text-foreground">
+            Content Management
+          </h1>
+          <p className="text-sm text-medium-gray">
+            Manage your series and chapters
+          </p>
         </div>
-        <Link 
-          to="/dashboard/content/create"
-          className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded hover:brightness-110 transition-all"
-        >
-          + New Serie
-        </Link>
+        <PrimaryLink to="/dashboard/content/create">+ New Serie</PrimaryLink>
       </div>
 
       <div className="bg-surface border border-[var(--color-border)/0.06] rounded-xl overflow-hidden">
@@ -32,28 +32,45 @@ function ContentIndex() {
           <table className="w-full text-sm">
             <thead className="bg-background border-b border-border">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-medium-gray uppercase tracking-wider">Cover</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-medium-gray uppercase tracking-wider">Title</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-medium-gray uppercase tracking-wider">Author</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-medium-gray uppercase tracking-wider">Category</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-medium-gray uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-medium-gray uppercase tracking-wider">
+                  Cover
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-medium-gray uppercase tracking-wider">
+                  Title
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-medium-gray uppercase tracking-wider">
+                  Author
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-medium-gray uppercase tracking-wider">
+                  Category
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-medium-gray uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {series.map((s) => (
-                <tr key={s.id} className="hover:bg-background transition-colors">
+                <tr
+                  key={s.id}
+                  className="hover:bg-background transition-colors"
+                >
                   <td className="px-4 py-3">
-                    <img 
-                      src={s.pictureUrl} 
-                      alt={s.title} 
+                    <img
+                      src={s.pictureUrl}
+                      alt={s.title}
                       className="w-10 h-14 object-cover rounded"
                     />
                   </td>
-                  <td className="px-4 py-3 text-foreground font-medium">{s.title}</td>
+                  <td className="px-4 py-3 text-foreground font-medium">
+                    {s.title}
+                  </td>
                   <td className="px-4 py-3 text-medium-gray">{s.author}</td>
-                  <td className="px-4 py-3 text-medium-gray">{s.category?.name}</td>
+                  <td className="px-4 py-3 text-medium-gray">
+                    {s.category?.name}
+                  </td>
                   <td className="px-4 py-3 text-right">
-                    <Link 
+                    <Link
                       to={`/dashboard/content/serie/${s.id}`}
                       className="text-accent-blue hover:text-white transition-colors text-sm"
                     >
@@ -65,7 +82,7 @@ function ContentIndex() {
             </tbody>
           </table>
         </div>
-        
+
         {series.length === 0 && (
           <div className="p-8 text-center text-dim-gray">
             No series found. Create your first serie to get started.
