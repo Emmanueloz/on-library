@@ -8,9 +8,6 @@ class LibrariesService {
     this.librariesRepo = librariesRepo;
   }
 
-  async query(name: string): Promise<ILibraries[]> {
-    return await this.librariesRepo.query(name);
-  }
   async getById(id: string): Promise<ILibraries | null> {
     return await this.librariesRepo.getById(id);
   }
@@ -20,6 +17,7 @@ class LibrariesService {
   async addSerie(id: string, idSerie: String): Promise<void> {
     return await this.librariesRepo.addSerie(id, idSerie);
   }
+
   async removeSerie(id: string, idSerie: String): Promise<void> {
     return await this.librariesRepo.removeSerie(id, idSerie);
   }
@@ -35,11 +33,20 @@ class LibrariesService {
   async getByUserId(userId: string): Promise<ILibraries[]> {
     return await this.librariesRepo.getByUserId(userId);
   }
-  async getByIdAndUserId(id: string, userId: string): Promise<ILibraries | null> {
+  async getByIdAndUserId(
+    id: string,
+    userId: string,
+  ): Promise<ILibraries | null> {
     return await this.librariesRepo.getByIdAndUserId(id, userId);
   }
   async existsSerie(idSerie: string): Promise<boolean> {
     return await this.librariesRepo.existsSerie(idSerie);
+  }
+  async getBySerieId(
+    idSerie: string,
+    idUser: string,
+  ): Promise<ILibraries | null> {
+    return await this.librariesRepo.getBySerieId(idSerie, idUser);
   }
 }
 
