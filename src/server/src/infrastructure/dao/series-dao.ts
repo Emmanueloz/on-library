@@ -37,7 +37,11 @@ class SeriesDao implements ISeriesRepo {
             tag: true,
           },
         },
-        chapters: true,
+        chapters: {
+          orderBy: {
+            number: "asc",
+          },
+        },
       },
     });
   }

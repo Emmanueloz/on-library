@@ -9,10 +9,6 @@ class LibrariesDao implements ILibrariesRepo {
     this.client = client;
   }
 
-  async query(name: string): Promise<ILibraries[]> {
-    return await this.client.libraries.findMany();
-  }
-
   async getById(id: string): Promise<ILibraries | null> {
     return await this.client.libraries.findUnique({
       where: { id },
@@ -26,7 +22,7 @@ class LibrariesDao implements ILibrariesRepo {
     id: string,
     userId: string,
   ): Promise<ILibraries | null> {
-    const libraries = await this.client.libraries.findUnique({
+    const library = await this.client.libraries.findUnique({
       where: { id, idUser: userId },
       include: {
         librariesOnSeries: {
@@ -60,13 +56,53 @@ class LibrariesDao implements ILibrariesRepo {
       },
     });
 
-    return libraries;
+    if (!library) {
+      return null;
+    }
+
+    return {
+      id: library.id,
+      name: library.name,
+      isPublic: library.isPublic,
+      idUser: library.idUser,
+      createdAt: library.createdAt,
+      series:
+        (library as any).librariesOnSeries?.map((ls: any) => ({
+          id: ls.serie.id,
+          title: ls.serie.title,
+          description: ls.serie.description,
+          pictureUrl: ls.serie.pictureUrl,
+          author: ls.serie.author,
+          category: ls.serie.category?.name,
+          tags: ls.serie.tagsOnSeries?.map((ts: any) => ts.tag.name),
+          chaptersCount: ls.serie._count?.chapters || 0,
+        })) || [],
+    };
   }
 
   async getByUserId(userId: string): Promise<ILibraries[]> {
-    return await this.client.libraries.findMany({
+    const result = await this.client.libraries.findMany({
       where: { idUser: userId },
+      select: {
+        id: true,
+        name: true,
+        idUser: true,
+        isPublic: true,
+        createdAt: true,
+        _count: {
+          select: { librariesOnSeries: true },
+        },
+      },
     });
+
+    return result.map(({ id, name, idUser, isPublic, createdAt, _count }) => ({
+      id,
+      name,
+      idUser,
+      isPublic,
+      createdAt,
+      seriesCount: _count.librariesOnSeries,
+    }));
   }
 
   async existsSerie(idSerie: string): Promise<boolean> {
@@ -74,6 +110,22 @@ class LibrariesDao implements ILibrariesRepo {
       where: { id: idSerie },
     });
     return !!serie;
+  }
+
+  async getBySerieId(
+    idSerie: string,
+    idUser: string,
+  ): Promise<ILibraries | null> {
+    return await this.client.libraries.findFirst({
+      where: {
+        idUser,
+        librariesOnSeries: {
+          some: {
+            idSerie: idSerie,
+          },
+        },
+      },
+    });
   }
 
   async create(library: Omit<ILibraries, "id">): Promise<ILibraries> {

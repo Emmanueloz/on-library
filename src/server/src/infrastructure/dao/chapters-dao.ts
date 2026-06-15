@@ -11,49 +11,64 @@ class ChaptersDao implements IChaptersRepo {
   }
 
   async query(q?: IQueryChapters): Promise<IChapter[]> {
-    if (q) {
-      const where: any = {};
+    const where: any = {};
+    const orderBy: any = {};
 
-      if (q.idSeries) {
-        where.idSeries = q.idSeries;
+    if (q?.idSeries) {
+      where.idSeries = q.idSeries;
+    }
+
+    if (q?.title) {
+      where.title = { contains: q.title };
+    }
+
+    if (q?.number) {
+      where.number = q.number;
+    }
+
+    if (q?.orderBy && q.orderType) {
+      if (q.orderBy == "number") {
+        orderBy.number = q.orderType;
+      } else if (q.orderBy == "createdAt") {
+        orderBy.createdAt = q.orderType;
       }
+    }
 
-      if (q.title) {
-        where.title = { contains: q.title };
-      }
-
-      if (q.number) {
-        where.number = q.number;
-      }
-
-      return await this.client.chapter.findMany({
-        where: where,
-        orderBy: {
-          number: "asc",
-        },
-        include: {
-          series: {
-            omit: {
-              author: true,
-              description: true,
-              idCategory: true,
-              createdAt: true,
-              publicationDate: true,
-            },
-            include: {
-              category: {
-                omit: {
-                  createdAt: true,
-                  id: true,
-                },
+    const chapters = await this.client.chapter.findMany({
+      where: where,
+      orderBy: orderBy,
+      select: {
+        id: true,
+        title: true,
+        number: true,
+        idSeries: true,
+        createdAt: true,
+        series: {
+          select: {
+            id: true,
+            title: true,
+            pictureUrl: true,
+            category: {
+              select: {
+                name: true,
               },
             },
           },
         },
-      });
-    }
+        _count: {
+          select: { pages: true },
+        },
+      },
+    });
 
-    return await this.client.chapter.findMany();
+    return chapters.map(({ id, title, number, idSeries, series, _count }) => ({
+      id,
+      title,
+      number,
+      idSeries,
+      series,
+      pagesCount: _count.pages,
+    }));
   }
 
   async getById(id: string): Promise<IChapter | null> {
