@@ -1,6 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import {
   LibraryId,
+  LibraryIdSerie,
+  type LibraryIdSerieType,
   type LibraryIdType,
 } from "../../schemas/libraries/params.ts";
 
@@ -17,7 +19,10 @@ export default async function (fastify: FastifyInstance) {
     async (request, reply) => {
       const userId = request.user.id;
       const libraries = await fastify.librariesService.getByUserId(userId);
-      return libraries;
+      return {
+        message: "Get success libraries",
+        data: libraries,
+      };
     },
   );
 
@@ -45,21 +50,38 @@ export default async function (fastify: FastifyInstance) {
       }
 
       return {
-        id: library.id,
-        name: library.name,
-        isPublic: library.isPublic,
-        createdAt: library.createdAt,
-        series:
-          (library as any).librariesOnSeries?.map((ls: any) => ({
-            id: ls.serie.id,
-            title: ls.serie.title,
-            description: ls.serie.description,
-            pictureUrl: ls.serie.pictureUrl,
-            author: ls.serie.author,
-            category: ls.serie.category?.name,
-            tags: ls.serie.tagsOnSeries?.map((ts: any) => ts.tag.name),
-            chaptersCount: ls.serie._count?.chapters || 0,
-          })) || [],
+        message: "Get success library",
+        data: library,
+      };
+    },
+  );
+
+  fastify.get<{ Params: LibraryIdSerieType }>(
+    "/serie/:idSerie",
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        tags: ["Libraries"],
+        params: LibraryIdSerie,
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    async (request, reply) => {
+      const { idSerie } = request.params;
+
+      const userId = request.user.id;
+      const library = await fastify.librariesService.getBySerieId(
+        idSerie,
+        userId,
+      );
+
+      if (!library) {
+        return reply.status(404).send({ message: "Library not found" });
+      }
+
+      return {
+        message: "Get success libraries",
+        data: library,
       };
     },
   );

@@ -32,7 +32,7 @@ export default async function (fastify: FastifyInstance) {
 
       await fastify.librariesService.delete(id);
 
-      return reply.status(204).send();
+      return reply.status(204).send({ message: "Delete library success" });
     },
   );
 
@@ -63,7 +63,9 @@ export default async function (fastify: FastifyInstance) {
 
       await fastify.librariesService.removeSerie(id, idSerie);
 
-      return reply.status(204).send();
+      return reply.status(204).send({
+        message: "Delete serie in library",
+      });
     },
   );
 }

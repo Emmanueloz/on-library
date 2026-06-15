@@ -1,16 +1,22 @@
 import Type from "typebox";
 
 export const LibraryId = Type.Object({
-    id: Type.String(),
+  id: Type.String(),
 });
 
 export type LibraryIdType = Type.Static<typeof LibraryId>;
 
 export const LibraryIdAndSerieId = Type.Intersect([
-    LibraryId,
-    Type.Object({
-        idSerie: Type.String(),
-    }),
+  LibraryId,
+  Type.Object({
+    idSerie: Type.String(),
+  }),
 ]);
 
 export type LibraryIdAndSerieIdType = Type.Static<typeof LibraryIdAndSerieId>;
+
+export const LibraryIdSerie = Type.Object({
+  idSerie: Type.String(),
+});
+
+export type LibraryIdSerieType = Type.Static<typeof LibraryIdSerie>;

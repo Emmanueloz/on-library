@@ -45,7 +45,10 @@ export default async function (fastify: FastifyInstance) {
         updateData,
       );
 
-      return updatedLibrary;
+      return {
+        message: "Update library",
+        data: updatedLibrary,
+      };
     },
   );
 }

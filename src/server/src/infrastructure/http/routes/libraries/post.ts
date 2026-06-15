@@ -33,7 +33,10 @@ export default async function (fastify: FastifyInstance) {
         isPublic: isPublic ?? false,
       });
 
-      return reply.status(201).send(library);
+      return reply.status(201).send({
+        message: "Create library",
+        data: library,
+      });
     },
   );
 
