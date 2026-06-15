@@ -13,5 +13,6 @@ export interface ISeries {
   category?: ICategories;
   idCategory: string;
   chapters?: IChapter[];
+  chaptersCount?: number;
   tagsOnSeries?: ITagsOnSeries[];
 }

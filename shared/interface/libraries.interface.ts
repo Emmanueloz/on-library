@@ -1,3 +1,4 @@
+import type { ISeries } from "./series.interface.ts";
 import type { IUser } from "./user.interface.ts";
 
 export interface ILibraries {
@@ -7,4 +8,6 @@ export interface ILibraries {
   idUser: string;
   isPublic: boolean;
   createdAt?: Date;
+  series?: ISeries[];
+  seriesCount?: number;
 }
