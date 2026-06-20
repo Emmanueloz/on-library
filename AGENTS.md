@@ -74,7 +74,22 @@ shared/       → Common types, interfaces, enums (@on-library/shared)
 5. **File uploads**: 50MB limit on server multipart uploads
 6. **No test suite**: No test scripts or test framework configured in any package
 7. **No CI/CD**: No GitHub Actions or similar workflows found
-8. **SQLite database**: `src/server/dev.db` is committed (development only)
+8. **SQLite database**: `src/server/dev.db` is NOT committed to git (in `.gitignore`). Data is local-only.
+
+## Database Safety Rules
+
+**CRITICAL: NEVER destroy user data without explicit permission.**
+
+1. **NEVER run `prisma migrate reset`** — This drops ALL tables and deletes ALL data. It is forbidden without the user explicitly requesting it.
+2. **NEVER run `prisma db push --force-reset`** — Same destructive effect as migrate reset.
+3. **Schema changes (adding tables/columns)**: Use `prisma db push` (safe, non-destructive). If drift is detected, DO NOT reset. Instead:
+   - Make a backup first: `cp src/server/dev.db src/server/dev.db.backup`
+   - Then try `prisma db push` again
+   - If it still fails, ask the user how to proceed
+4. **New tables or structural changes**: Always ask the user for confirmation before applying. Present what will change.
+5. **Backup before any risky operation**: `cp src/server/dev.db src/server/dev.db.$(date +%Y%m%d_%H%M%S)`
+6. **The seed only creates**: admin user (admin@onlibrary.com / Admin123!) and permissions. All other data must be re-created manually if lost.
+7. **If data loss occurs**: Immediately inform the user and explain what was lost and what can be recovered.
 
 ## Key Files
 
