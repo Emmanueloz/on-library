@@ -25,6 +25,12 @@ import type { IUsersRepo } from "../../application/features/users/users-repo.ts"
 import { UsersDao } from "../dao/users-dao.ts";
 import { JwtService } from "../security/JwtService.ts";
 import { BcryptService } from "../security/bcryptService.ts";
+import { FollowingService } from "../../application/features/following/following-service.ts";
+import type { IFollowingRepo } from "../../application/features/following/following-repo.ts";
+import { FollowingDao } from "../dao/following-dao.ts";
+import { ReadingHistoryService } from "../../application/features/history/history-service.ts";
+import type { IReadChaptersRepo } from "../../application/features/history/history-repo.ts";
+import { ReadChaptersDao } from "../dao/history-dao.ts";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -36,6 +42,8 @@ declare module "fastify" {
     librariesService: LibrariesService;
     authService: AuthService;
     usersService: UsersService;
+    followingService: FollowingService;
+    readingHistoryService: ReadingHistoryService;
   }
 }
 
@@ -67,6 +75,12 @@ export default fp(async (fastify: FastifyInstance) => {
   const usersRepo: IUsersRepo = new UsersDao(fastify.prisma);
   const usersService = new UsersService(usersRepo, encryptService);
 
+  const followingRepo: IFollowingRepo = new FollowingDao(fastify.prisma);
+  const followingService = new FollowingService(followingRepo);
+
+  const readChaptersRepo: IReadChaptersRepo = new ReadChaptersDao(fastify.prisma);
+  const readingHistoryService = new ReadingHistoryService(readChaptersRepo);
+
   fastify.decorate("seriesService", seriesService);
   fastify.decorate("tagsService", tagsService);
   fastify.decorate("categoriesService", categoriesService);
@@ -75,4 +89,6 @@ export default fp(async (fastify: FastifyInstance) => {
   fastify.decorate("librariesService", librariesService);
   fastify.decorate("authService", authService);
   fastify.decorate("usersService", usersService);
+  fastify.decorate("followingService", followingService);
+  fastify.decorate("readingHistoryService", readingHistoryService);
 });

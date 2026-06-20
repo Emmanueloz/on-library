@@ -22,12 +22,15 @@ export function Nav() {
           >
             Home
           </Link>
-          <Link
-            to="/libraries"
-            className="text-medium-gray hover:text-white transition-opacity duration-200 text-sm font-medium"
-          >
-            Library
-          </Link>
+
+          {isAuthenticated() && (
+            <Link
+              to="/libraries"
+              className="text-medium-gray hover:text-white transition-opacity duration-200 text-sm font-medium"
+            >
+              Library
+            </Link>
+          )}
           <Link
             to="/titles"
             className="text-medium-gray hover:text-white transition-opacity duration-200 text-sm font-medium"

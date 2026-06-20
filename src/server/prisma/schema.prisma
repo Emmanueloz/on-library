@@ -20,6 +20,8 @@ model User {
   createdAt       DateTime          @default(now())
   libraries       Libraries[]
   userPermissions UserPermissions[]
+  followingSeries FollowingSeries[]
+  readChapters    ReadChapters[]
 }
 
 enum TypePermission {
@@ -69,6 +71,7 @@ model Series {
   chapters          Chapter[]
   tagsOnSeries      TagsOnSeries[]
   librariesOnSeries LibrariesOnSeries[]
+  followingSeries   FollowingSeries[]
 }
 
 model LibrariesOnSeries {
@@ -111,6 +114,7 @@ model Chapter {
   title     String
   number    Float
   createdAt DateTime @default(now())
+  readBy    ReadChapters[]
 }
 
 model Pages {
@@ -121,4 +125,26 @@ model Pages {
   url        String
   type       String
   createdAt  DateTime @default(now())
+}
+
+model FollowingSeries {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [idUser], references: [id])
+  idUser    String
+  serie     Series   @relation(fields: [idSerie], references: [id])
+  idSerie   String
+  createdAt DateTime @default(now())
+
+  @@unique([idUser, idSerie])
+}
+
+model ReadChapters {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [idUser], references: [id])
+  idUser    String
+  chapter   Chapter  @relation(fields: [idChapter], references: [id])
+  idChapter String
+  readAt    DateTime @default(now())
+
+  @@unique([idUser, idChapter])
 }

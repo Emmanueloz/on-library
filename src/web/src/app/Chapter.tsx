@@ -3,13 +3,21 @@ import { useParams, Link } from "react-router";
 import { useChapter } from "../hooks/useChapter";
 import { useChaptersBySeries } from "../hooks/useChaptersBySeries";
 import { useConfig } from "../hooks/useConfig";
+import { useReadingHistory } from "../hooks/useReadingHistory";
+import { AuthContext } from "../context/AuthContex";
 import { LazyImage } from "../components/common/LazyImage";
+import { use } from "react";
 
 function Chapter() {
   const { id } = useParams();
   const { chapter, errorChapter, isLoading } = useChapter({ id });
   const { chapters } = useChaptersBySeries(
     chapter?.series?.id ? String(chapter.series.id) : "",
+  );
+  const authContext = use(AuthContext);
+  const isAuthenticated = authContext?.isAuthenticated() ?? false;
+  const { readChapterIds, markAsRead, markAsUnread } = useReadingHistory(
+    chapter?.idSeries,
   );
 
   const [showSettings, setShowSettings] = useState(false);
@@ -196,6 +204,25 @@ function Chapter() {
             </Link>
           ) : (
             <span className="px-4 py-2 text-dim-gray">← Previous Chapter</span>
+          )}
+
+          {isAuthenticated && chapter?.id && (
+            <button
+              onClick={() => {
+                if (readChapterIds.has(chapter.id!)) {
+                  markAsUnread(chapter.id!);
+                } else {
+                  markAsRead(chapter.id!, true);
+                }
+              }}
+              className={`px-4 py-2 rounded transition-all ${
+                readChapterIds.has(chapter.id!)
+                  ? "bg-primary/20 text-primary border border-primary/30"
+                  : "bg-surface text-foreground hover:bg-stone-800"
+              }`}
+            >
+              {readChapterIds.has(chapter.id!) ? "Read ✓" : "Mark as Read"}
+            </button>
           )}
 
           <Link

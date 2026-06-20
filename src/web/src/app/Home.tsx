@@ -13,9 +13,9 @@ function Home() {
   }
 
   return (
-    <main className="p-2">
+    <main className="p-4">
       {errorChapters ?? <p>{errorChapters}</p>}
-      <section className="grid grid-cols-4 gap-2">
+      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {chapters.map((c) => (
           <CardChapter key={c.id} chapter={c} />
         ))}

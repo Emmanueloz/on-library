@@ -17,6 +17,8 @@ const modules = [
   "series",
   "tags",
   "users",
+  "following",
+  "history",
 ];
 const permissionTypes = ["READ", "WRITE", "DELETE"] as const;
 

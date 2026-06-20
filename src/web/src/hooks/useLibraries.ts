@@ -76,12 +76,55 @@ const useLibraries = () => {
     }
   };
 
+  const addSerieToLibrary = async (libraryId: string, serieId: string) => {
+    const headers = buildAuthHeaders(token, isAuthenticated());
+    const fetchOptions: RequestInit = {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ idSerie: serieId }),
+    };
+
+    const res = await fetch(
+      `${configEnv.apiUrl}/api/libraries/${libraryId}/serie`,
+      fetchOptions,
+    );
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.message || "Failed to add serie to library");
+    }
+
+    return result;
+  };
+
+  const removeSerieFromLibrary = async (libraryId: string, serieId: string) => {
+    const headers = buildAuthHeaders(token, isAuthenticated(),false);
+    const fetchOptions: RequestInit = {
+      method: "DELETE",
+      headers,
+    };
+
+    const res = await fetch(
+      `${configEnv.apiUrl}/api/libraries/${libraryId}/serie/${serieId}`,
+      fetchOptions,
+    );
+
+    if (!res.ok && res.status !== 204) {
+      const result = await res.json();
+      throw new Error(result.message || "Failed to remove serie from library");
+    }
+
+    return true;
+  };
+
   return {
     libraries,
     isLoading,
     errorLibraries,
     errorCreateLibrary,
     addLibrary,
+    addSerieToLibrary,
+    removeSerieFromLibrary,
   };
 };
 
