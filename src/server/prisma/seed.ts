@@ -71,6 +71,50 @@ async function main() {
     console.log("Admin user already exists");
   }
 
+  const categories = [
+    "Manga", "Manhwa", "Manhua", "Comic",
+    "Light Novela", "Webtoon", "Novela",
+  ];
+
+  for (const name of categories) {
+    try {
+      await prisma.categories.upsert({
+        where: { name },
+        update: {},
+        create: { name },
+      });
+    } catch (e: any) {
+      if (e.code !== "P2002") {
+        console.error(`Error creating category ${name}:`, e.message);
+      }
+    }
+  }
+  console.log(`${categories.length} categories created/updated`);
+
+  const tags = [
+    "Acción", "Aventura", "Comedia", "Drama", "Fantasía",
+    "Romance", "Ciencia Ficción", "Sobrenatural", "Terror",
+    "Thriller", "Deportes", "Slice of Life", "Mecha",
+    "Militar", "Misterio", "Psicológico", "Historia",
+    "Artes Marciales", "Tragedia", "Musical", "Harem",
+    "Isekai", "Ecchi", "Seinen", "Shounen", "Shoujo", "Josei",
+  ];
+
+  for (const name of tags) {
+    try {
+      await prisma.tags.upsert({
+        where: { name },
+        update: {},
+        create: { name },
+      });
+    } catch (e: any) {
+      if (e.code !== "P2002") {
+        console.error(`Error creating tag ${name}:`, e.message);
+      }
+    }
+  }
+  console.log(`${tags.length} tags created/updated`);
+
   console.log("Seed completed successfully");
 }
 
