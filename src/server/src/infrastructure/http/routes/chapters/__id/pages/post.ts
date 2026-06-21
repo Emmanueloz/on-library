@@ -83,7 +83,14 @@ export default async function (fastify: FastifyInstance) {
       const { id: idChapter } = request.params;
 
       const data = request.body;
-      if (!data || !data.files || data.files.length === 0) {
+      if (!data || !data.files) {
+        return reply.status(400).send({
+          message: "At least one image file is required",
+        });
+      }
+
+      const files = Array.isArray(data.files) ? data.files : [data.files];
+      if (files.length === 0) {
         return reply.status(400).send({
           message: "At least one image file is required",
         });
@@ -96,7 +103,7 @@ export default async function (fastify: FastifyInstance) {
         buffer: Buffer;
       }> = [];
 
-      for (const file of data.files) {
+      for (const file of files) {
         if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype ?? "")) {
           return reply.status(400).send({
             message: `Invalid image type: ${file.mimetype}. Allowed: png, jpg, jpeg, webp`,
