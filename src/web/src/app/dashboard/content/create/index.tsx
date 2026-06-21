@@ -16,6 +16,8 @@ function CreateSerie() {
     images,
     isLoading: isSearching,
     clearImages,
+    searchOne,
+    isSearchingOne,
   } = useJikanSearch();
 
   const [formData, setFormData] = useState({
@@ -38,6 +40,10 @@ function CreateSerie() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "title") {
+      setJikanQuery(value);
+    }
   };
 
   const handleTagChange = (tagId: string) => {
@@ -59,7 +65,52 @@ function CreateSerie() {
     setFormData((prev) => ({ ...prev, pictureUrl: imageUrl }));
     setShowJikanModal(false);
     clearImages();
-    setJikanQuery("");
+  };
+
+  const handleAutoFill = async () => {
+    if (!formData.title.trim()) return;
+
+    const result = await searchOne(formData.title);
+    if (!result) return;
+
+    const publicationDate = result.published?.from
+      ? result.published.from.slice(0, 10)
+      : "";
+
+    const matchedCategory = categories.find(
+      (cat) =>
+        cat.name &&
+        result.type &&
+        cat.name.toLowerCase() === result.type.toLowerCase(),
+    );
+
+    const jikanTagNames = [
+      ...(result.genres?.map((g) => g.name) ?? []),
+      ...(result.themes?.map((t) => t.name) ?? []),
+      ...(result.demographics?.map((d) => d.name) ?? []),
+    ];
+
+    const matchedTagIds = allTags
+      .filter(
+        (tag) =>
+          tag.id &&
+          tag.name &&
+          jikanTagNames.some(
+            (jikanName) => jikanName.toLowerCase() === tag.name!.toLowerCase(),
+          ),
+      )
+      .map((tag) => tag.id!);
+
+    setFormData((prev) => ({
+      ...prev,
+      description: result.synopsis || prev.description,
+      publicationDate: publicationDate || prev.publicationDate,
+      idCategory: matchedCategory?.id || prev.idCategory,
+    }));
+
+    if (matchedTagIds.length > 0) {
+      setSelectedTags(matchedTagIds);
+    }
   };
 
   const handleSubmit = async () => {
@@ -174,9 +225,18 @@ function CreateSerie() {
           </div>
         )}
 
-        <PrimaryButton disabled={isLoading} onClick={handleSubmit}>
-          {isLoading ? "Creating..." : "Create Serie"}
-        </PrimaryButton>
+        <div className="flex gap-3">
+          <PrimaryButton disabled={isLoading} onClick={handleSubmit}>
+            {isLoading ? "Creating..." : "Create Serie"}
+          </PrimaryButton>
+          <button
+            onClick={handleAutoFill}
+            disabled={!formData.title.trim() || isSearchingOne}
+            className="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded hover:brightness-110 transition-all disabled:opacity-50"
+          >
+            {isSearchingOne ? "Searching..." : "Auto-fill from Jikan"}
+          </button>
+        </div>
       </div>
 
       <div className="lg:col-span-4 space-y-6">
