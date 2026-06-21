@@ -62,7 +62,7 @@ function EditChapter() {
         <div className="lg:col-span-8 space-y-6">
           <section className="bg-surface border border-[var(--color-border)/0.06] rounded-xl p-6">
             <div className="flex items-center gap-2 text-primary border-b border-border pb-2 mb-4">
-              <span className="text-lg">ℹ</span>
+              <span className="text-lg">✎</span>
               <h3 className="font-semibold uppercase text-xs tracking-wider">
                 Chapter Information
               </h3>

@@ -6,7 +6,7 @@ import { useCreateChapter } from "../../hooks/useCreateChapter";
 import { useUpdateSeries } from "../../hooks/useUpdateSeries";
 import { useSerie } from "../../hooks/useSerie";
 import { useState } from "react";
-import { useJikanSearch } from "../../hooks/useJikanSearch";
+import { JikanImageModal } from "../common/JikanImageModal";
 import type { ISeries } from "@on-library/shared";
 
 function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
@@ -16,12 +16,6 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
   const { updateSeries, isLoading: isUpdating } = useUpdateSeries();
   const { categories } = useCategories();
   const { tags } = useTags();
-  const {
-    search: searchJikan,
-    images: jikanImages,
-    isLoading: isSearchingJikan,
-    clearImages: clearJikanImages,
-  } = useJikanSearch();
   const { refetch: refetchSerie } = useSerie({ id });
 
   const [showNewChapter, setShowNewChapter] = useState(false);
@@ -36,10 +30,10 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
     idCategory: serie.idCategory,
     publicationDate: serie.publicationDate.toString().split("T")[0],
     description: serie.description,
-    pictureUrl: serie.pictureUrl,
   });
 
-  const [newPictureUrl, setNewPictureUrl] = useState(serie.pictureUrl || "");
+  const [pendingPictureUrl, setPendingPictureUrl] = useState("");
+  const [showJikanModal, setShowJikanModal] = useState(false);
 
   const [selectedTags, setSelectedTags] = useState<string[]>(
     () =>
@@ -48,8 +42,8 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
         .filter((id): id is string => Boolean(id)) || [],
   );
 
-  const [showJikanModal, setShowJikanModal] = useState(false);
-  const [jikanQuery, setJikanQuery] = useState("");
+  const hasNewPicture = pendingPictureUrl !== "";
+  const currentPictureUrl = hasNewPicture ? pendingPictureUrl : serie.pictureUrl;
 
   const handleToggleTag = (tagId: string) => {
     setSelectedTags((prev) =>
@@ -77,27 +71,18 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
   };
 
   const handleUpdatePicture = async () => {
-    if (!id || !newPictureUrl) return;
+    if (!id || !hasNewPicture) return;
     try {
-      await updateSeries(id, { pictureUrl: newPictureUrl });
+      await updateSeries(id, { pictureUrl: pendingPictureUrl });
       refetchSerie();
-      setNewPictureUrl("");
+      setPendingPictureUrl("");
     } catch {
       // Error handled in hook
     }
   };
 
-  const handleJikanSearch = () => {
-    if (jikanQuery.trim()) {
-      searchJikan(jikanQuery);
-    }
-  };
-
-  const handleSelectJikanImage = (imageUrl: string) => {
-    setNewPictureUrl(imageUrl);
-    setShowJikanModal(false);
-    clearJikanImages();
-    setJikanQuery("");
+  const handleCancelPicture = () => {
+    setPendingPictureUrl("");
   };
 
   return (
@@ -372,109 +357,48 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
               </h3>
             </div>
 
-            {serie.pictureUrl && (
-              <img
-                src={serie.pictureUrl}
-                alt={serie.title}
-                className="w-full rounded-lg mb-4"
-              />
-            )}
-
-            <button
-              onClick={() => setShowJikanModal(true)}
-              className="w-full px-3 py-2 bg-background border border-border text-medium-gray text-sm rounded hover:border-primary/50 transition-all"
-            >
-              Search Cover
-            </button>
-
-            {newPictureUrl && (
-              <div className="mt-3">
-                <p className="text-xs text-medium-gray mb-2">New:</p>
+            {currentPictureUrl && (
+              <div className="relative group cursor-pointer rounded-lg overflow-hidden mb-4" onClick={() => setShowJikanModal(true)}>
                 <img
-                  src={newPictureUrl}
-                  alt="Preview"
-                  className="w-full rounded-lg mb-2"
+                  src={currentPictureUrl}
+                  alt={serie.title}
+                  className="w-full rounded-lg"
                 />
-                <button
-                  onClick={handleUpdatePicture}
-                  disabled={isUpdating}
-                  className="w-full px-3 py-2 bg-primary text-white text-xs font-semibold rounded hover:brightness-110 transition-all disabled:opacity-50"
-                >
-                  {isUpdating ? "Updating..." : "Update Cover"}
-                </button>
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                  <span className="bg-white text-background px-3 py-1 text-xs font-semibold rounded">
+                    Change
+                  </span>
+                </div>
+                {hasNewPicture && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleCancelPicture(); }}
+                    className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-black/80 text-white text-xs rounded-full flex items-center justify-center transition-colors"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             )}
 
-            {showJikanModal && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-stone-900 border border-border rounded-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Search Cover Image
-                    </h3>
-                    <button
-                      onClick={() => {
-                        setShowJikanModal(false);
-                        clearJikanImages();
-                      }}
-                      className="text-dim-gray hover:text-white transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
+            {!currentPictureUrl && (
+              <button
+                onClick={() => setShowJikanModal(true)}
+                className="w-full aspect-video bg-background border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center text-center p-4 hover:border-primary/50 transition-colors"
+              >
+                <span className="text-4xl text-dim-gray mb-2">+</span>
+                <p className="text-sm text-medium-gray">Search Cover</p>
+                <p className="text-[10px] text-dim-gray">Click to search with Jikan</p>
+              </button>
+            )}
 
-                  <div className="flex gap-3 mb-4">
-                    <input
-                      type="text"
-                      value={jikanQuery}
-                      onChange={(e) => setJikanQuery(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === "Enter" && handleJikanSearch()
-                      }
-                      placeholder="Search manga..."
-                      className="flex-1 bg-background border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
-                    />
-                    <button
-                      onClick={handleJikanSearch}
-                      disabled={isSearchingJikan}
-                      className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded hover:brightness-110 transition-all disabled:opacity-50"
-                    >
-                      {isSearchingJikan ? "..." : "Search"}
-                    </button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto">
-                    {jikanImages.length > 0 ? (
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                        {jikanImages.map((img, index) => (
-                          <button
-                            key={index}
-                            onClick={() =>
-                              img.images.jpg.large_image_url &&
-                              handleSelectJikanImage(
-                                img.images.jpg.large_image_url,
-                              )
-                            }
-                            className="aspect-3/4 overflow-hidden rounded hover:ring-2 hover:ring-primary transition-all"
-                          >
-                            <img
-                              src={img.images.jpg.small_image_url}
-                              alt={img.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-center text-dim-gray py-8">
-                        {isSearchingJikan
-                          ? "Searching..."
-                          : "No results yet. Search for a manga cover."}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+            {hasNewPicture && (
+              <button
+                onClick={handleUpdatePicture}
+                disabled={isUpdating}
+                className="w-full mt-3 px-3 py-2 bg-primary text-white text-xs font-semibold rounded hover:brightness-110 transition-all disabled:opacity-50"
+              >
+                {isUpdating ? "Updating..." : "Update Cover"}
+              </button>
             )}
           </section>
 
@@ -520,6 +444,14 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
           </section>
         </div>
       </div>
+
+      {showJikanModal && (
+        <JikanImageModal
+          onClose={() => setShowJikanModal(false)}
+          onSelect={(url) => setPendingPictureUrl(url)}
+          initialQuery={formData.title}
+        />
+      )}
     </div>
   );
 }
