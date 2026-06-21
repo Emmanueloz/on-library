@@ -5,7 +5,7 @@ interface IChaptersRepo {
   query(q?: IQueryChapters): Promise<IChapter[]>;
   getById(id: string): Promise<IChapter | null>;
   create(chapter: Omit<IChapter, "id">): Promise<IChapter>;
-  update(id: string, chapter: IChapter): Promise<IChapter | null>;
+  update(id: string, chapter: Partial<IChapter>): Promise<IChapter | null>;
   delete(id: string): Promise<void>;
 }
 

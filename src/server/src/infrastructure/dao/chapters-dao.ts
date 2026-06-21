@@ -91,14 +91,15 @@ class ChaptersDao implements IChaptersRepo {
     });
   }
 
-  async update(id: string, chapter: IChapter): Promise<IChapter | null> {
+  async update(id: string, chapter: Partial<IChapter>): Promise<IChapter | null> {
+    const data : any = {};
+
+    if (chapter.title) data.title = chapter.title;
+    if (chapter.number) data.number = chapter.number;
+
     return await this.client.chapter.update({
       where: { id },
-      data: {
-        title: chapter.title,
-        number: chapter.number,
-        idSeries: chapter.idSeries,
-      },
+      data
     });
   }
 

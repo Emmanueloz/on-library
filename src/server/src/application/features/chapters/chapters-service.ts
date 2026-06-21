@@ -17,7 +17,7 @@ class ChaptersService {
   async create(chapter: IChapter): Promise<IChapter> {
     return await this.chaptersRepo.create(chapter);
   }
-  async update(id: string, chapter: IChapter): Promise<IChapter | null> {
+  async update(id: string, chapter: Partial<IChapter>): Promise<IChapter | null> {
     return await this.chaptersRepo.update(id, chapter);
   }
   async delete(id: string): Promise<void> {

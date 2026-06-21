@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import type { IChapter } from "@on-library/shared";
 import {
   ChapterIdParams,
   type ChapterIdParamsType,
@@ -25,13 +26,12 @@ export default async function (fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const { id } = request.params;
-      const { title, number, idSeries } = request.body;
+      const { title, number } = request.body;
 
-      const chapter = await fastify.chaptersService.update(id, {
-        title,
-        number,
-        idSeries,
-      });
+      const data: Partial<IChapter> = { title };
+      if (number !== undefined) data.number = number;
+
+      const chapter = await fastify.chaptersService.update(id, data);
 
       return {
         message: "Update Chapter",
