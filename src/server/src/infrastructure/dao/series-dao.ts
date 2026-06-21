@@ -80,14 +80,19 @@ class SeriesDao implements ISeriesRepo {
     if (series.publicationDate) data.publicationDate = series.publicationDate;
     if (series.idCategory) data.idCategory = series.idCategory;
 
-    if (series.tags && series.tags.length > 0) {
-      data.tagsOnSeries = {
-        createMany: {
-          data: series.tags.map((idTag) => ({
-            idTag,
-          })),
-        },
-      };
+    if (series.tags) {
+      await this.client.tagsOnSeries.deleteMany({
+        where: { idSeries: id },
+      });
+      if (series.tags.length > 0) {
+        data.tagsOnSeries = {
+          createMany: {
+            data: series.tags.map((idTag) => ({
+              idTag,
+            })),
+          },
+        };
+      }
     }
 
     return await this.client.series.update({
