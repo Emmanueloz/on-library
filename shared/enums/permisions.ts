@@ -3,7 +3,6 @@ export enum ModulePermission {
   Categories = "categories",
   Series = "series",
   Chapters = "chapters",
-  Pages = "pages",
   Tags = "tags",
   Libraries = "libraries",
   Following = "following",
