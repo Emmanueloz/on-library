@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "FASTIFY_AUTOLOAD_TYPESCRIPT=1 node --watch src/index.ts",
-    "start": "node src/index.ts"
+    "dev": "FASTIFY_AUTOLOAD_TYPESCRIPT=1 node --experimental-transform-types --watch src/index.ts",
+    "start": "node --experimental-transform-types src/index.ts"
   },
   "prisma": {
-    "seed": "node prisma/seed.ts"
+    "seed": "node --experimental-transform-types prisma/seed.ts"
   },
   "type": "module",
   "keywords": [],
