@@ -1,5 +1,10 @@
 # AGENTS.md
 
+## CRITICAL Rules
+
+1. **NEVER auto-commit to git.** Only commit when the user explicitly requests it (e.g., "guarda", "commit", "sube"). Even if changes were requested and applied, the user must validate and explicitly ask to save before committing. Do NOT commit after every fix or change as a default behavior.
+2. **TypeScript only, no JavaScript.** All code is written in `.ts`/`.tsx`. Node executes `.ts` directly using `--experimental-transform-types`. Never use `.js` files or suggest switching to JS. Enums are preferred over `as const` objects.
+
 ## Quick Commands
 
 ```bash
@@ -37,7 +42,7 @@ shared/       → Common types, interfaces, enums (@on-library/shared)
 - **Route autoloading**: `src/infrastructure/http/routes/` (files named `[verb]-[resource].ts` pattern, registered at `/api` prefix)
 - **Plugin autoloading**: `src/infrastructure/plugins/` (auth plugin loaded first)
 - **Architecture pattern**: `application/` (business logic, features) → `infrastructure/` (HTTP, DAOs, services)
-- **Dev mode**: `FASTIFY_AUTOLOAD_TYPESCRIPT=1 node --watch src/index.ts`
+- **Dev mode**: `FASTIFY_AUTOLOAD_TYPESCRIPT=1 node --experimental-transform-types --watch src/index.ts`
 - **Swagger**: Available at `/documentation`
 - **Media files**: Served from `src/server/media/` at `/media/` prefix
 - **Env**: `.env` with `DATABASE_URL="file:./dev.db"` and `SECRET_KEY`
@@ -63,13 +68,12 @@ shared/       → Common types, interfaces, enums (@on-library/shared)
 
 - **Package**: `@on-library/shared` (workspace reference)
 - **Exports**: interfaces, types, enums from barrel `index.ts`
-- **Note**: `tsconfig.app.json` in web explicitly includes `../../shared/enums/permisions.ts` (note: filename has typo "permisions")
 
 ## Gotchas
 
 1. **Build order matters**: Desktop needs `web/dist` to exist. Always `build:web` before `build:desktop`
 2. **Prisma client location**: Generated to `./prisma-client` (not default `node_modules/.prisma/client`). Import from `../prisma/prisma-client/client.ts`
-3. **Server runs with `--watch`**: Dev mode uses Node's native watch mode, not nodemon
+3. **Server runs with `--experimental-transform-types`**: Dev mode uses Node's native TypeScript transform (supports enums, not just type stripping). Combined with `--watch` for file changes
 4. **CORS is enabled**: Server allows all origins with GET, POST, PUT, DELETE methods
 5. **File uploads**: 50MB limit on server multipart uploads
 6. **No test suite**: No test scripts or test framework configured in any package
