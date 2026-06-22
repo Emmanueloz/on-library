@@ -62,7 +62,7 @@ class UsersService {
     const permissions: Record<string, string[]> = {};
     for (const up of user.userPermissions || []) {
       const moduleName = up.permission.name;
-      const permType = up.permission.type.toLowerCase();
+      const permType = up.permission.type;
       if (!permissions[moduleName]) {
         permissions[moduleName] = [];
       }

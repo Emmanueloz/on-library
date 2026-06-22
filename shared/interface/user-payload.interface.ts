@@ -1,5 +1,6 @@
-import type { PermissionsPayload } from "../types";
-import type { IUser } from "./user.interface";
+import type { PermissionsPayload } from "../types/index.ts";
+import type { IUser } from "./user.interface.ts";
+
 
 interface IUserPayload extends Omit<
   IUser,

@@ -1,7 +1,7 @@
 import fp from "fastify-plugin";
 import fastifyJwt from "@fastify/jwt";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import type { IUser, IUserPayload } from "@on-library/shared";
+import { ModulePermission, TypePermission, type IUser, type IUserPayload } from "@on-library/shared";
 import { config } from "../../config/index.ts";
 
 declare module "@fastify/jwt" {
@@ -20,26 +20,26 @@ declare module "fastify" {
   }
 }
 
-function extractModuleFromUrl(url: string): string | undefined {
+function extractModuleFromUrl(url: string): ModulePermission | undefined {
   const pathParts = url.split("/").filter(Boolean);
   if (pathParts.length >= 2 && pathParts[0] === "api") {
     if (pathParts[1] === "auth") {
       return undefined;
     }
-    return pathParts[1];
+    return pathParts[1] as ModulePermission;
   }
   return undefined;
 }
 
-function getRequiredPermission(method: string): string | null {
+function getRequiredPermission(method: string): TypePermission | null {
   switch (method) {
     case "GET":
-      return "read";
+      return TypePermission.Read;
     case "POST":
     case "PUT":
-      return "write";
+      return TypePermission.Write;
     case "DELETE":
-      return "delete";
+      return TypePermission.Delete;
     default:
       return null;
   }

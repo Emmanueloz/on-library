@@ -1,15 +1,17 @@
-export const enum ModulePermission {
+export enum ModulePermission {
   Users = "users",
+  Categories = "categories",
   Series = "series",
   Chapters = "chapters",
   Pages = "pages",
-  Categories = "categories",
   Tags = "tags",
   Libraries = "libraries",
+  Following = "following",
+  History = "history",
 }
 
-export const enum TypePermission {
-  Read = "read",
-  Write = "write",
-  Delete = "delete",
+export enum TypePermission {
+  Read = "READ",
+  Write = "WRITE",
+  Delete = "DELETE",
 }

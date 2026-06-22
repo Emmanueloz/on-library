@@ -105,7 +105,7 @@ class AuthService {
       user.userPermissions?.reduce(
         (acc, up) => {
           const module = up.permission.name;
-          const type = up.permission.type.toLowerCase();
+          const type = up.permission.type;
           if (!acc[module]) {
             acc[module] = [];
           }

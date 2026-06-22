@@ -1,5 +1,5 @@
-import type { ModulePermission, TypePermission } from "../enums";
+import type { ModulePermission, TypePermission } from "../enums/index.ts";
 
-type PermissionsPayload = Record<ModulePermission, TypePermission[]>;
+type PermissionsPayload = Partial<Record<ModulePermission, TypePermission[]>>;
 
 export type { PermissionsPayload };

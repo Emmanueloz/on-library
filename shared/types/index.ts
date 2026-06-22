@@ -1,1 +1,1 @@
-export type {PermissionsPayload} from "./permissions-payload.ts"
+export * from "./permissions-payload.ts"

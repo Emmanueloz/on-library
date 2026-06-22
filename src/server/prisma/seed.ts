@@ -1,6 +1,7 @@
 import { PrismaClient } from "../prisma/prisma-client/client.ts";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { BcryptService } from "../src/infrastructure/security/bcryptService.ts";
+import { ModulePermission, TypePermission } from "@on-library/shared";
 
 const prisma = new PrismaClient({
   adapter: new PrismaBetterSqlite3({
@@ -10,17 +11,9 @@ const prisma = new PrismaClient({
 
 const encryptionService = new BcryptService();
 
-const modules = [
-  "categories",
-  "chapters",
-  "libraries",
-  "series",
-  "tags",
-  "users",
-  "following",
-  "history",
-];
-const permissionTypes = ["READ", "WRITE", "DELETE"] as const;
+const modules = Object.values(ModulePermission);
+
+const permissionTypes = Object.values(TypePermission);
 
 async function main() {
   console.log("Starting seed...");
