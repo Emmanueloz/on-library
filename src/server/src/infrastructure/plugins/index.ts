@@ -10,6 +10,7 @@ import { CategoriesServices } from "../../application/features/categories/catego
 import { CategoriesDao } from "../dao/categories-dao.ts";
 import { ChaptersDao } from "../dao/chapters-dao.ts";
 import { ChaptersService } from "../../application/features/chapters/chapters-service.ts";
+import { XlsxSpreadsheetParser } from "../services/xlsx-spreadsheet-parser.ts";
 import { PagesDao } from "../dao/pages-dao.ts";
 import { PagesService } from "../../application/features/pages/pages-service.ts";
 import { FilesystemImageStorage } from "../services/filesystem-image-storage.ts";
@@ -58,7 +59,8 @@ export default fp(async (fastify: FastifyInstance) => {
   const categoriesService = new CategoriesServices(categoriesRepo);
 
   const chaptersRepo = new ChaptersDao(fastify.prisma);
-  const chaptersService = new ChaptersService(chaptersRepo);
+  const spreadsheetParser = new XlsxSpreadsheetParser();
+  const chaptersService = new ChaptersService(chaptersRepo, spreadsheetParser);
 
   const imageStorage = new FilesystemImageStorage(MEDIA_DIR);
   const pagesRepo = new PagesDao(fastify.prisma);

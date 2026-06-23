@@ -7,6 +7,7 @@ import { useUpdateSeries } from "../../hooks/useUpdateSeries";
 import { useSerie } from "../../hooks/useSerie";
 import { useState } from "react";
 import { JikanImageModal } from "../common/JikanImageModal";
+import { ImportChaptersModal } from "./ImportChaptersModal";
 import type { ISeries } from "@on-library/shared";
 
 function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
@@ -19,6 +20,7 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
   const { refetch: refetchSerie } = useSerie({ id });
 
   const [showNewChapter, setShowNewChapter] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [newChapter, setNewChapter] = useState({
     title: "",
     number: 0,
@@ -213,12 +215,20 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
                   Chapters
                 </h3>
               </div>
-              <button
-                onClick={() => setShowNewChapter(true)}
-                className="text-xs text-accent-blue hover:underline"
-              >
-                + New Chapter
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowNewChapter(true)}
+                  className="text-xs text-accent-blue hover:underline"
+                >
+                  + New Chapter
+                </button>
+                <button
+                  onClick={() => setShowImportModal(true)}
+                  className="text-xs text-accent-blue hover:underline"
+                >
+                  + Import
+                </button>
+              </div>
             </div>
 
             {showNewChapter && (
@@ -450,6 +460,14 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
           onClose={() => setShowJikanModal(false)}
           onSelect={(url) => setPendingPictureUrl(url)}
           initialQuery={formData.title}
+        />
+      )}
+
+      {showImportModal && (
+        <ImportChaptersModal
+          idSeries={id}
+          onClose={() => setShowImportModal(false)}
+          onImported={() => refetchChapters()}
         />
       )}
     </div>

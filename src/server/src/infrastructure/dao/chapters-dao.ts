@@ -91,6 +91,29 @@ class ChaptersDao implements IChaptersRepo {
     });
   }
 
+  async createMany(chapters: Array<Omit<IChapter, "id">>): Promise<IChapter[]> {
+    const first = chapters[0];
+    if (!first) return [];
+
+    await this.client.chapter.createMany({
+      data: chapters.map((ch) => ({
+        title: ch.title,
+        number: ch.number,
+        idSeries: ch.idSeries,
+      })),
+    });
+
+    const created = await this.client.chapter.findMany({
+      where: {
+        idSeries: first.idSeries,
+        number: { in: chapters.map((ch) => ch.number) },
+      },
+      orderBy: { number: "asc" },
+    });
+
+    return created;
+  }
+
   async update(id: string, chapter: Partial<IChapter>): Promise<IChapter | null> {
     const data : any = {};
 
