@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
 import { useChapter } from "../hooks/useChapter";
 import { useChaptersBySeries } from "../hooks/useChaptersBySeries";
@@ -22,6 +22,10 @@ function Chapter() {
 
   const [showSettings, setShowSettings] = useState(false);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   const currentIndex = chapters.findIndex((c) => c.id === id);
   const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
