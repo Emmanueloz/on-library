@@ -19,6 +19,7 @@ import { AuthLayout } from "../app/auth/__AuthLayout";
 import { Libraries } from "../app/library/Libraries";
 import { EditSerie } from "../app/dashboard/content/serie";
 import { EditChapter } from "../app/dashboard/content/chapter";
+import { Users } from "../app/dashboard/Users";
 
 function AppRouter() {
   return (
@@ -46,6 +47,7 @@ function AppRouter() {
               <Route path="content/chapter/:id" element={<EditChapter />} />
               <Route path="tags" element={<Tags />} />
               <Route path="categories" element={<Categories />} />
+              <Route path="users" element={<Users />} />
             </Route>
             <Route path="auth" element={<AuthLayout />}>
               <Route path="login" element={<Login />} />

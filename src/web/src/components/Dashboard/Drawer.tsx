@@ -43,6 +43,13 @@ function Drawer() {
       module: ModulePermission.Categories,
       permission: [TypePermission.Write, TypePermission.Delete],
     },
+    {
+      path: "/dashboard/users",
+      label: "Users",
+      icon: "👥",
+      module: ModulePermission.Users,
+      permission: [TypePermission.Read],
+    },
   ];
 
   return (
