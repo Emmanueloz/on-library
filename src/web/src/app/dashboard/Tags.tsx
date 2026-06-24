@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { useTags } from "../../hooks/useTags";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { AuthContext } from "../../context/AuthContex";
+import { ModulePermission, TypePermission } from "@on-library/shared";
+import { PermissionGate } from "../../components/common/PermissionGate";
 
 function Tags() {
   const { tags, errorTags, isLoading, addTag, updateTag, deleteTag } =
@@ -9,6 +12,12 @@ function Tags() {
   const [nameTag, setNameTag] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState<string | null>(null);
+
+  const authContext = use(AuthContext);
+
+  if (!authContext) {
+    throw new Error("useAuth must be used within a AuthProvider");
+  }
 
   if (isLoading) {
     return (
@@ -35,6 +44,14 @@ function Tags() {
   };
 
   const handleEditTag = (id?: string) => {
+    if (
+      !authContext.hasSinglePermission(
+        ModulePermission.Tags,
+        TypePermission.Write,
+      )
+    )
+      return;
+
     setIsEditing(id ?? null);
     const tag = tags.find((t) => t.id === id);
     if (tag) {
@@ -68,12 +85,17 @@ function Tags() {
           <h1 className="text-2xl font-semibold text-foreground">Tags</h1>
           <p className="text-sm text-medium-gray">Manage your tags</p>
         </div>
-        <PrimaryButton
-          onClick={handleAddTag}
-          disabled={isAdding || isEditing !== null}
+        <PermissionGate
+          module={ModulePermission.Tags}
+          permission={TypePermission.Write}
         >
-          + New Tag
-        </PrimaryButton>
+          <PrimaryButton
+            onClick={handleAddTag}
+            disabled={isAdding || isEditing !== null}
+          >
+            + New Tag
+          </PrimaryButton>
+        </PermissionGate>
       </div>
 
       {errorTags && <p className="text-primary text-sm">{errorTags}</p>}
@@ -92,6 +114,36 @@ function Tags() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
+              {isAdding && (
+                <tr className="bg-background">
+                  <td className="px-3 py-2">
+                    <input
+                      type="text"
+                      value={nameTag}
+                      onChange={(e) => setNameTag(e.target.value)}
+                      className="w-full bg-background border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+                      placeholder="Tag name"
+                    />
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={handleSaveTag}
+                        className="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded hover:brightness-110 transition-all"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setIsAdding(false)}
+                        className="px-3 py-1.5 text-medium-gray text-xs hover:text-white transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )}
+
               {tags.map((tag) => (
                 <tr
                   key={tag.id}
@@ -132,48 +184,23 @@ function Tags() {
                       </td>
                       <td className="px-3 py-2 text-right">
                         <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => tag.id && handleDeleteTag(tag.id)}
-                            className="text-primary hover:text-white transition-colors text-xs"
+                          <PermissionGate
+                            module={ModulePermission.Tags}
+                            permission={TypePermission.Delete}
                           >
-                            Delete
-                          </button>
+                            <button
+                              onClick={() => tag.id && handleDeleteTag(tag.id)}
+                              className="text-primary hover:text-white transition-colors text-xs"
+                            >
+                              Delete
+                            </button>
+                          </PermissionGate>
                         </div>
                       </td>
                     </>
                   )}
                 </tr>
               ))}
-
-              {isAdding && (
-                <tr className="bg-background">
-                  <td className="px-3 py-2">
-                    <input
-                      type="text"
-                      value={nameTag}
-                      onChange={(e) => setNameTag(e.target.value)}
-                      className="w-full bg-background border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
-                      placeholder="Tag name"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={handleSaveTag}
-                        className="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded hover:brightness-110 transition-all"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setIsAdding(false)}
-                        className="px-3 py-1.5 text-medium-gray text-xs hover:text-white transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
 

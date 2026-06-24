@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { useCategories } from "../../hooks/useCategories";
 import { PrimaryButton } from "../../components/common/PrimaryButton";
+import { AuthContext } from "../../context/AuthContex";
+import { ModulePermission, TypePermission } from "@on-library/shared";
+import { PermissionGate } from "../../components/common/PermissionGate";
 
 function Categories() {
   const {
@@ -15,6 +18,12 @@ function Categories() {
   const [nameCategory, setNameCategory] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState<string | null>(null);
+
+  const authContext = use(AuthContext);
+
+  if (!authContext) {
+    throw new Error("useAuth must be used within a AuthProvider");
+  }
 
   if (isLoading) {
     return (
@@ -41,6 +50,14 @@ function Categories() {
   };
 
   const handleEditCategory = (id?: string) => {
+    if (
+      !authContext.hasSinglePermission(
+        ModulePermission.Categories,
+        TypePermission.Write,
+      )
+    )
+      return;
+
     setIsEditing(id ?? null);
     const category = categories.find((cat) => cat.id === id);
     if (category) {
@@ -74,12 +91,17 @@ function Categories() {
           <h1 className="text-2xl font-semibold text-foreground">Categories</h1>
           <p className="text-sm text-medium-gray">Manage your categories</p>
         </div>
-        <PrimaryButton
-          onClick={handleAddCategory}
-          disabled={isAdding || isEditing !== null}
+        <PermissionGate
+          module={ModulePermission.Categories}
+          permission={TypePermission.Write}
         >
-          + New Category
-        </PrimaryButton>
+          <PrimaryButton
+            onClick={handleAddCategory}
+            disabled={isAdding || isEditing !== null}
+          >
+            + New Category
+          </PrimaryButton>
+        </PermissionGate>
       </div>
 
       {errorCategories && (
@@ -100,6 +122,35 @@ function Categories() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
+              {isAdding && (
+                <tr className="bg-background">
+                  <td className="px-3 py-2">
+                    <input
+                      type="text"
+                      value={nameCategory}
+                      onChange={(e) => setNameCategory(e.target.value)}
+                      className="w-full bg-background border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+                      placeholder="Category name"
+                    />
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={handleSaveCategory}
+                        className="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded hover:brightness-110 transition-all"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setIsAdding(false)}
+                        className="px-3 py-1.5 text-medium-gray text-xs hover:text-white transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {categories.map((category) => (
                 <tr
                   key={category.id}
@@ -140,50 +191,25 @@ function Categories() {
                       </td>
                       <td className="px-3 py-2 text-right">
                         <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() =>
-                              category.id && handleDeleteCategory(category.id)
-                            }
-                            className="text-primary hover:text-white transition-colors text-xs"
+                          <PermissionGate
+                            module={ModulePermission.Categories}
+                            permission={TypePermission.Delete}
                           >
-                            Delete
-                          </button>
+                            <button
+                              onClick={() =>
+                                category.id && handleDeleteCategory(category.id)
+                              }
+                              className="text-primary hover:text-white transition-colors text-xs"
+                            >
+                              Delete
+                            </button>
+                          </PermissionGate>
                         </div>
                       </td>
                     </>
                   )}
                 </tr>
               ))}
-
-              {isAdding && (
-                <tr className="bg-background">
-                  <td className="px-3 py-2">
-                    <input
-                      type="text"
-                      value={nameCategory}
-                      onChange={(e) => setNameCategory(e.target.value)}
-                      className="w-full bg-background border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
-                      placeholder="Category name"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={handleSaveCategory}
-                        className="px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded hover:brightness-110 transition-all"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setIsAdding(false)}
-                        className="px-3 py-1.5 text-medium-gray text-xs hover:text-white transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
 
