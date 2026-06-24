@@ -31,11 +31,14 @@ export default async function (fastify: FastifyInstance) {
       await fastify.usersService.updatePermissions(id, permissions);
       const updatedPermissions = await fastify.usersService.getPermissions(id);
 
-      return {
-        id: user.id,
-        username: user.username,
-        permissions: updatedPermissions,
-      };
+      return reply.status(200).send({
+        message: "User permissions updated successfully",
+        data: {
+          id: user.id,
+          username: user.username,
+          permissions: updatedPermissions,
+        },
+      });
     },
   );
 }

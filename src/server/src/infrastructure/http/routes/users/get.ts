@@ -13,7 +13,11 @@ export default async function (fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const users = await fastify.usersService.query();
-      return users;
+      
+      return reply.status(200).send({
+        message: "Users retrieved successfully",
+        data: users,
+      });
     },
   );
 
@@ -35,7 +39,10 @@ export default async function (fastify: FastifyInstance) {
         return reply.status(404).send({ message: "User not found" });
       }
 
-      return user;
+      return reply.status(200).send({
+        message: "User retrieved successfully",
+        data:user,
+      });
     },
   );
 
@@ -59,7 +66,10 @@ export default async function (fastify: FastifyInstance) {
 
       const libraries = await fastify.usersService.getLibraries(id);
 
-      return libraries;
+      return reply.status(200).send({
+        message: "Libraries retrieved successfully",
+        data: libraries,
+      });
     },
   );
 }

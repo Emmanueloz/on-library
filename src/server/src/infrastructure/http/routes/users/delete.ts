@@ -27,7 +27,11 @@ export default async function (fastify: FastifyInstance) {
 
       await fastify.usersService.delete(id);
 
-      return reply.status(204).send();
+      return reply.status(204).send(
+        {
+          message: "User deleted successfully",
+        }
+      );
     },
   );
 
@@ -52,7 +56,9 @@ export default async function (fastify: FastifyInstance) {
 
       await fastify.usersService.deletePermissions(id, request.body.permissions);
 
-      return reply.status(204).send();
+      return reply.status(204).send({
+        message: "User permissions deleted successfully",
+      });
     },
   );
 }
