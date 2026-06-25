@@ -26,6 +26,9 @@ function AppRouter() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="chapter">
+            <Route path=":id" element={<Chapter />} />
+          </Route>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="libraries">
@@ -36,9 +39,7 @@ function AppRouter() {
             <Route path="serie">
               <Route path=":id" element={<Serie />} />
             </Route>
-            <Route path="chapter">
-              <Route path=":id" element={<Chapter />} />
-            </Route>
+
             <Route path="dashboard" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="content" element={<ContentIndex />} />

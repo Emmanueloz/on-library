@@ -61,7 +61,7 @@ function Chapter() {
     <>
       {errorChapter && <p className="text-primary">{errorChapter}</p>}
 
-      <div className="fixed top-0 left-0 right-0 z-40 bg-stone-950/80 backdrop-blur-sm border-b border-border">
+      <div className="fixed top-0 left-0 right-0 h-14 z-40 bg-stone-950/80 backdrop-blur-sm border-b border-border">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-4">
             <Link
@@ -157,7 +157,7 @@ function Chapter() {
         </div>
       </div>
 
-      <main className="w-full h-full bg-neutral-900 flex flex-col items-center">
+      <main className="w-full h-full mt-14 bg-neutral-900 flex flex-col items-center">
         {viewMode === "page-by-page" ? (
           <div className="relative w-full h-[calc(100vh-56px)] flex items-center justify-center">
             <button
