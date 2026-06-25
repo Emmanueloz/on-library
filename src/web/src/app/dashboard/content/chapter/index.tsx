@@ -35,7 +35,7 @@ function EditChapter() {
       pageNumber: page.pageNumber,
     })) || [];
 
-  if (isLoadingChapter) {
+  if (isLoadingChapter && !chapter) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-medium-gray">Loading...</p>

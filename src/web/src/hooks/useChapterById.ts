@@ -1,4 +1,4 @@
-import { use, useEffect, useState, useCallback } from "react";
+import { use, useEffect, useState, useCallback, useRef } from "react";
 import { configEnv } from "../config";
 import type { IChapter } from "@on-library/shared";
 import { AuthContext } from "../context/AuthContex";
@@ -8,6 +8,7 @@ const useChapterById = (id: string | undefined) => {
   const [chapter, setChapter] = useState<IChapter | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasLoadedRef = useRef(false);
 
   const authContext = use(AuthContext);
   if (!authContext) {
@@ -18,7 +19,9 @@ const useChapterById = (id: string | undefined) => {
   const fetchChapter = useCallback(async () => {
     if (!id) return;
 
-    setIsLoading(true);
+    if (!hasLoadedRef.current) {
+      setIsLoading(true);
+    }
     setError(null);
 
     try {
@@ -33,6 +36,7 @@ const useChapterById = (id: string | undefined) => {
       }
 
       setChapter(result.data);
+      hasLoadedRef.current = true;
     } catch (err) {
       setError(`${err}`);
     } finally {
