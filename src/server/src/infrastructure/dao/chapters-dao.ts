@@ -12,8 +12,8 @@ class ChaptersDao implements IChaptersRepo {
 
   async query(q?: IQueryChapters): Promise<IChapter[]> {
     const where: any = {};
-    const orderBy: any = {};
-
+    const orderBy: any[] = [] 
+    
     if (q?.idSeries) {
       where.idSeries = q.idSeries;
     }
@@ -28,9 +28,11 @@ class ChaptersDao implements IChaptersRepo {
 
     if (q?.orderBy && q.orderType) {
       if (q.orderBy == "number") {
-        orderBy.number = q.orderType;
+        orderBy.length = 0;
+        orderBy.push({ groupNum: q.orderType }, { number: q.orderType });
       } else if (q.orderBy == "createdAt") {
-        orderBy.createdAt = q.orderType;
+        orderBy.length = 0;
+        orderBy.push({ createdAt: q.orderType });
       }
     }
 

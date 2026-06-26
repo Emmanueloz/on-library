@@ -5,10 +5,16 @@ export const ChaptersQuerySchema = Type.Object({
   number: Type.Optional(Type.Number({ minimum: 0 })),
   idSeries: Type.Optional(Type.String({ minLength: 1 })),
   orderBy: Type.Optional(
-    Type.Union([Type.Literal("number"), Type.Literal("createdAt")]),
+    Type.Enum({
+      number: "number",
+      createdAt: "createdAt",
+    }),
   ),
   orderType: Type.Optional(
-    Type.Union([Type.Literal("asc"), Type.Literal("desc")]),
+    Type.Enum({
+      asc: "asc",
+      desc: "desc",
+    }),
   ),
 });
 
