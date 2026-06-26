@@ -7,6 +7,8 @@ interface CreateChapterData {
   title: string;
   number: number;
   idSeries: string;
+  groupNum?: number | null;
+  groupTitle?: string | null;
 }
 
 const useCreateChapter = () => {

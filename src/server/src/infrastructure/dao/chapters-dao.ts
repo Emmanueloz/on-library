@@ -42,6 +42,8 @@ class ChaptersDao implements IChaptersRepo {
         title: true,
         number: true,
         idSeries: true,
+        groupNum: true,
+        groupTitle: true,
         createdAt: true,
         series: {
           select: {
@@ -61,11 +63,13 @@ class ChaptersDao implements IChaptersRepo {
       },
     });
 
-    return chapters.map(({ id, title, number, idSeries, series, _count }) => ({
+    return chapters.map(({ id, title, number, idSeries, groupNum, groupTitle, series, _count }) => ({
       id,
       title,
       number,
       idSeries,
+      groupNum: groupNum ?? null,
+      groupTitle: groupTitle ?? null,
       series,
       pagesCount: _count.pages,
     }));
@@ -87,6 +91,8 @@ class ChaptersDao implements IChaptersRepo {
         title: chapter.title,
         number: chapter.number,
         idSeries: chapter.idSeries,
+        groupNum: chapter.groupNum ?? null,
+        groupTitle: chapter.groupTitle ?? null,
       },
     });
   }
@@ -100,6 +106,8 @@ class ChaptersDao implements IChaptersRepo {
         title: ch.title,
         number: ch.number,
         idSeries: ch.idSeries,
+        groupNum: ch.groupNum ?? null,
+        groupTitle: ch.groupTitle ?? null,
       })),
     });
 
@@ -108,17 +116,22 @@ class ChaptersDao implements IChaptersRepo {
         idSeries: first.idSeries,
         number: { in: chapters.map((ch) => ch.number) },
       },
-      orderBy: { number: "asc" },
+      orderBy: [
+        { groupNum: "asc" },
+        { number: "asc" },
+      ],
     });
 
     return created;
   }
 
   async update(id: string, chapter: Partial<IChapter>): Promise<IChapter | null> {
-    const data : any = {};
+    const data: any = {};
 
     if (chapter.title) data.title = chapter.title;
     if (chapter.number) data.number = chapter.number;
+    if (chapter.groupNum !== undefined) data.groupNum = chapter.groupNum;
+    if (chapter.groupTitle !== undefined) data.groupTitle = chapter.groupTitle;
 
     return await this.client.chapter.update({
       where: { id },

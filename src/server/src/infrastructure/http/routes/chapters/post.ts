@@ -45,12 +45,14 @@ export default async function (fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const { title, number, idSeries } = request.body;
+      const { title, number, idSeries, groupNum, groupTitle } = request.body;
 
       const chapter = await fastify.chaptersService.create({
         title,
         number,
         idSeries,
+        groupNum: groupNum ?? null,
+        groupTitle: groupTitle ?? null,
       });
 
       return {

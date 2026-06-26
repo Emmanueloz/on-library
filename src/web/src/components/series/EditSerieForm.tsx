@@ -24,6 +24,8 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
   const [newChapter, setNewChapter] = useState({
     title: "",
     number: 0,
+    groupNum: "",
+    groupTitle: "",
   });
 
   const [formData, setFormData] = useState({
@@ -270,6 +272,41 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
                       className="w-full bg-surface border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
                     />
                   </div>
+                  <div>
+                    <label className="text-xs font-medium text-medium-gray block mb-1">
+                      Group Number (optional)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={newChapter.groupNum}
+                      onChange={(e) =>
+                        setNewChapter((prev) => ({
+                          ...prev,
+                          groupNum: e.target.value,
+                        }))
+                      }
+                      placeholder="e.g. 1, 1.5, 2"
+                      className="w-full bg-surface border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-medium-gray block mb-1">
+                      Group Title (optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={newChapter.groupTitle}
+                      onChange={(e) =>
+                        setNewChapter((prev) => ({
+                          ...prev,
+                          groupTitle: e.target.value,
+                        }))
+                      }
+                      placeholder="e.g. Arc 3, Volume 1"
+                      className="w-full bg-surface border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+                    />
+                  </div>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <button
@@ -280,10 +317,12 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
                           title: newChapter.title,
                           number: newChapter.number,
                           idSeries: id,
+                          groupNum: newChapter.groupNum !== "" ? Number(newChapter.groupNum) : null,
+                          groupTitle: newChapter.groupTitle || null,
                         });
                         if (result?.id) {
                           setShowNewChapter(false);
-                          setNewChapter({ title: "", number: 0 });
+                          setNewChapter({ title: "", number: 0, groupNum: "", groupTitle: "" });
                           refetchChapters();
                         }
                       } catch {
@@ -316,6 +355,12 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
                       Title
                     </th>
                     <th className="px-3 py-2 text-left text-xs font-semibold text-medium-gray uppercase">
+                      Group #
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-medium-gray uppercase">
+                      Group Name
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-medium-gray uppercase">
                       Pages
                     </th>
                     <th className="px-3 py-2 text-right text-xs font-semibold text-medium-gray uppercase">
@@ -334,6 +379,12 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
                       </td>
                       <td className="px-3 py-2 text-foreground">
                         {chapter.title}
+                      </td>
+                      <td className="px-3 py-2 text-medium-gray">
+                        {chapter.groupNum ?? "—"}
+                      </td>
+                      <td className="px-3 py-2 text-medium-gray">
+                        {chapter.groupTitle || "—"}
                       </td>
                       <td className="px-3 py-2 text-medium-gray">
                         {chapter.pagesCount || 0}

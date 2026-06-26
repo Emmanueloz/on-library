@@ -107,13 +107,15 @@ model TagsOnSeries {
 }
 
 model Chapter {
-  id        String   @id @default(cuid())
-  series    Series   @relation(fields: [idSeries], references: [id])
+  id        String    @id @default(cuid())
+  series    Series    @relation(fields: [idSeries], references: [id])
   idSeries  String
   pages     Pages[]
   title     String
   number    Float
-  createdAt DateTime @default(now())
+  groupNum    Float?
+  groupTitle  String?
+  createdAt   DateTime  @default(now())
   readBy    ReadChapters[]
 }
 

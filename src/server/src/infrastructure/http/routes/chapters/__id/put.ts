@@ -26,10 +26,12 @@ export default async function (fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const { id } = request.params;
-      const { title, number } = request.body;
+      const { title, number, groupNum, groupTitle } = request.body;
 
       const data: Partial<IChapter> = { title };
       if (number !== undefined) data.number = number;
+      if (groupNum !== undefined) data.groupNum = groupNum;
+      if (groupTitle !== undefined) data.groupTitle = groupTitle;
 
       const chapter = await fastify.chaptersService.update(id, data);
 

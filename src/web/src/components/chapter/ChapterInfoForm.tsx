@@ -12,13 +12,20 @@ function ChapterInfoForm({ chapter, onUpdated }: ChapterInfoFormProps) {
 
   const [title, setTitle] = useState(chapter.title);
   const [number, setNumber] = useState(chapter.number);
+  const [groupNum, setGroupNum] = useState(chapter.groupNum ?? "");
+  const [groupTitle, setGroupTitle] = useState(chapter.groupTitle ?? "");
 
-  const hasChanges = title !== chapter.title || number !== chapter.number;
+  const hasChanges = title !== chapter.title || number !== chapter.number || groupNum !== (chapter.groupNum ?? "") || groupTitle !== (chapter.groupTitle ?? "");
 
   const handleUpdate = async () => {
     if (!chapter.id || !title.trim()) return;
     try {
-      await updateChapter(chapter.id, { title: title.trim(), number });
+      await updateChapter(chapter.id, {
+        title: title.trim(),
+        number,
+        groupNum: groupNum !== "" ? Number(groupNum) : null,
+        groupTitle: groupTitle || null,
+      });
       onUpdated();
     } catch {
       // Error handled in hook
@@ -34,7 +41,7 @@ function ChapterInfoForm({ chapter, onUpdated }: ChapterInfoFormProps) {
         </h3>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-3 gap-6">
         <div className="space-y-1">
           <label className="text-xs font-medium text-medium-gray block">
             Chapter Number
@@ -67,6 +74,33 @@ function ChapterInfoForm({ chapter, onUpdated }: ChapterInfoFormProps) {
           <p className="text-sm text-foreground py-2">
             {chapter.series?.title || "—"}
           </p>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-medium-gray block">
+            Group Number
+          </label>
+          <input
+            type="number"
+            step="0.1"
+            value={groupNum}
+            onChange={(e) => setGroupNum(e.target.value === "" ? "" : parseFloat(e.target.value))}
+            placeholder="e.g. 1, 1.5, 2"
+            className="w-full bg-background border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-medium-gray block">
+            Group Title
+          </label>
+          <input
+            type="text"
+            value={groupTitle}
+            onChange={(e) => setGroupTitle(e.target.value)}
+            placeholder="e.g. Arc 3, Volume 1"
+            className="w-full bg-background border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
+          />
         </div>
       </div>
 

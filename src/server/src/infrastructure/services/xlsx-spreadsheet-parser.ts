@@ -1,11 +1,20 @@
 import * as XLSX from "xlsx";
 import type { ISpreadsheetParserRepo } from "../../application/common/spreadsheet-parser-repo.ts";
 
+function stripBom(buf: Buffer): Buffer {
+  if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) {
+    return buf.subarray(3);
+  }
+  return buf;
+}
+
 class XlsxSpreadsheetParser implements ISpreadsheetParserRepo {
   async parseChaptersFromBuffer(
     buffer: Buffer,
-  ): Promise<Array<{ title: string; number: number }>> {
-    const workbook = XLSX.read(buffer, { type: "buffer" });
+  ): Promise<Array<{ title: string; number: number; groupNum?: number | null; groupTitle?: string | null }>> {
+    const clean = stripBom(buffer);
+    const text = clean.toString("utf-8");
+    const workbook = XLSX.read(text, { type: "string", codepage: 65001 });
 
     const sheetName = workbook.SheetNames[0];
     if (!sheetName) {
@@ -20,6 +29,8 @@ class XlsxSpreadsheetParser implements ISpreadsheetParserRepo {
     const rows = XLSX.utils.sheet_to_json<{
       title?: string;
       number?: number;
+      groupNum?: number;
+      groupTitle?: string;
     }>(sheet);
 
     if (rows.length === 0) {
@@ -32,8 +43,7 @@ class XlsxSpreadsheetParser implements ISpreadsheetParserRepo {
       throw new Error('Spreadsheet must have "title" and "number" columns');
     }
 
-    const chapters: Array<{ title: string; number: number }> = [];
-    const seenNumbers = new Set<number>();
+    const chapters: Array<{ title: string; number: number; groupNum?: number | null; groupTitle?: string | null }> = [];
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i] as Record<string, unknown>;
@@ -50,15 +60,21 @@ class XlsxSpreadsheetParser implements ISpreadsheetParserRepo {
       if (!title) {
         throw new Error(`Row ${i + 2}: title is required`);
       }
-      if (isNaN(number) || number <= 0) {
+      if (isNaN(number) || number < 0) {
         throw new Error(`Row ${i + 2}: number must be a positive number`);
       }
-      if (seenNumbers.has(number)) {
-        throw new Error(`Row ${i + 2}: duplicate chapter number ${number}`);
-      }
 
-      seenNumbers.add(number);
-      chapters.push({ title, number });
+      const rawGroupNum = typeof row.groupNum === "number"
+        ? row.groupNum
+        : parseFloat(String(row.groupNum ?? ""));
+      const groupNum = !isNaN(rawGroupNum) ? rawGroupNum : null;
+
+      const rawGroupTitle = typeof row.groupTitle === "string"
+        ? row.groupTitle.trim()
+        : String(row.groupTitle ?? "").trim();
+      const groupTitle = rawGroupTitle !== "" ? rawGroupTitle : null;
+
+      chapters.push({ title, number, groupNum, groupTitle });
     }
 
     return chapters;

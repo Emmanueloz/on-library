@@ -6,6 +6,8 @@ import { buildAuthHeaders } from "../utils/buildAuthHeaders";
 interface UpdateChapterData {
   title: string;
   number?: number;
+  groupNum?: number | null;
+  groupTitle?: string | null;
 }
 
 const useUpdateChapter = () => {

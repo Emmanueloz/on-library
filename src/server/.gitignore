@@ -4,7 +4,7 @@ node_modules
 
 prisma/prisma-client
 
-*.db
+*.db*
 *.sqlite
 
 media/

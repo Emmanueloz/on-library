@@ -10,4 +10,6 @@ export interface IChapter {
   pages?: IPages[];
   pagesCount?: number;
   createdAt?: Date;
+  groupNum?: number | null;
+  groupTitle?: string | null;
 }

@@ -81,9 +81,11 @@ function ImportChaptersModal({
             File format:
           </p>
           <pre className="text-xs text-dim-gray font-mono">
-{`title,number
-Chapter 1,1
-Chapter 2,2`}
+{`title,number,groupNum,groupTitle
+Chapter 1,1,1,Arc 3
+Chapter 2,2,1,Arc 3
+Chapter 3,3,,`
+}
           </pre>
         </div>
 
