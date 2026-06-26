@@ -12,10 +12,10 @@ function ChapterInfoForm({ chapter, onUpdated }: ChapterInfoFormProps) {
 
   const [title, setTitle] = useState(chapter.title);
   const [number, setNumber] = useState(chapter.number);
-  const [groupNum, setGroupNum] = useState(chapter.groupNum ?? "");
+  const [groupNum, setGroupNum] = useState(chapter.groupNum != null ? String(chapter.groupNum) : "");
   const [groupTitle, setGroupTitle] = useState(chapter.groupTitle ?? "");
 
-  const hasChanges = title !== chapter.title || number !== chapter.number || groupNum !== (chapter.groupNum ?? "") || groupTitle !== (chapter.groupTitle ?? "");
+  const hasChanges = title !== chapter.title || number !== chapter.number || groupNum !== (chapter.groupNum != null ? String(chapter.groupNum) : "") || groupTitle !== (chapter.groupTitle ?? "");
 
   const handleUpdate = async () => {
     if (!chapter.id || !title.trim()) return;
@@ -23,8 +23,8 @@ function ChapterInfoForm({ chapter, onUpdated }: ChapterInfoFormProps) {
       await updateChapter(chapter.id, {
         title: title.trim(),
         number,
-        groupNum: groupNum !== "" ? Number(groupNum) : null,
-        groupTitle: groupTitle || null,
+        groupNum: groupNum !== "" ? Number(groupNum) : "",
+        groupTitle: groupTitle || "",
       });
       onUpdated();
     } catch {
@@ -84,7 +84,7 @@ function ChapterInfoForm({ chapter, onUpdated }: ChapterInfoFormProps) {
             type="number"
             step="0.1"
             value={groupNum}
-            onChange={(e) => setGroupNum(e.target.value === "" ? "" : parseFloat(e.target.value))}
+            onChange={(e) => setGroupNum(e.target.value)}
             placeholder="e.g. 1, 1.5, 2"
             className="w-full bg-background border border-[var(--color-border)/0.08] rounded px-3 py-2 text-sm focus:border-primary/50 focus:outline-none"
           />
