@@ -24,7 +24,7 @@ const useChaptersBySeries = (idSeries: string) => {
     try {
       const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(
-        `${configEnv.apiUrl}/api/chapters/?idSeries=${idSeries}&orderBy=number&orderType=asc`,
+        `${configEnv.apiUrl}/api/chapters/?idSeries=${idSeries}&orderBy=number&orderType=desc`,
         { headers },
       );
       const result = await res.json();
