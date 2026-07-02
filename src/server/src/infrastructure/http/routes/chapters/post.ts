@@ -47,6 +47,8 @@ export default async function (fastify: FastifyInstance) {
     async (request, reply) => {
       const { title, number, idSeries, groupNum, groupTitle } = request.body;
 
+      console.log("Received request to create chapter:", request.body);
+
       const chapter = await fastify.chaptersService.create({
         title,
         number,

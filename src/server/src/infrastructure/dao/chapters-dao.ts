@@ -88,14 +88,20 @@ class ChaptersDao implements IChaptersRepo {
   }
 
   async create(chapter: Omit<IChapter, "id">): Promise<IChapter> {
+
+    const data: any = {
+      title: chapter.title,
+      number: chapter.number,
+      idSeries: chapter.idSeries,
+    };
+
+    if (chapter.groupNum !== undefined || chapter.groupNum !== null) data.groupNum = chapter.groupNum;
+    if (chapter.groupTitle !== undefined || chapter.groupTitle !== null) data.groupTitle = chapter.groupTitle;
+
+    console.log("Creating chapter with data:", data);
+
     return await this.client.chapter.create({
-      data: {
-        title: chapter.title,
-        number: chapter.number,
-        idSeries: chapter.idSeries,
-        groupNum: chapter.groupNum ?? null,
-        groupTitle: chapter.groupTitle ?? null,
-      },
+      data
     });
   }
 
