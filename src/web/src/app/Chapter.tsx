@@ -2,40 +2,40 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
 import { useChapter } from "../hooks/useChapter";
 import { useChaptersBySeries } from "../hooks/useChaptersBySeries";
-import { useConfig } from "../hooks/useConfig";
+import { useConfig, type ViewMode } from "../hooks/useConfig";
 import { useReadingHistory } from "../hooks/useReadingHistory";
 import { AuthContext } from "../context/AuthContex";
 import { LazyImage } from "../components/common/LazyImage";
 import { use } from "react";
 
-function Chapter() {
-  const { id } = useParams();
-  const { chapter, errorChapter, isLoading } = useChapter({ id });
-  const { chapters } = useChaptersBySeries(
-    chapter?.series?.id ? String(chapter.series.id) : "",
-  );
-  const authContext = use(AuthContext);
-  const isAuthenticated = authContext?.isAuthenticated() ?? false;
-  const { readChapterIds, markAsRead, markAsUnread } = useReadingHistory(
-    chapter?.idSeries,
-  );
+function ChapterReader(props: {
+  chapter: ReturnType<typeof useChapter>['chapter'];
+  prevChapter: ReturnType<typeof useChaptersBySeries>['chapters'][number] | null;
+  nextChapter: ReturnType<typeof useChaptersBySeries>['chapters'][number] | null;
+  isAuthenticated: boolean;
+  readChapterIds: Set<string>;
+  markAsRead: (id: string, read: boolean) => void;
+  markAsUnread: (id: string) => void;
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
+}) {
+  const {
+    chapter,
+    prevChapter,
+    nextChapter,
+    isAuthenticated,
+    readChapterIds,
+    markAsRead,
+    markAsUnread,
+    viewMode,
+    setViewMode,
+  } = props;
 
   const [showSettings, setShowSettings] = useState(false);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
-
-  const currentIndex = chapters.findIndex((c) => c.id === id);
-  const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
-  const nextChapter =
-    currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
-
   const totalPages = chapter?.pages?.length || 0;
   const currentPage = chapter?.pages?.[currentPageIndex];
-
-  const { viewMode, setViewMode } = useConfig();
 
   const handlePrevPage = () => {
     if (currentPageIndex > 0) {
@@ -49,18 +49,8 @@ function Chapter() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-medium-gray">loading...</p>
-      </div>
-    );
-  }
-
   return (
     <>
-      {errorChapter && <p className="text-primary">{errorChapter}</p>}
-
       <div className="fixed top-0 left-0 right-0 h-14 z-40 bg-stone-950/80 backdrop-blur-sm border-b border-border">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-4">
@@ -85,7 +75,7 @@ function Chapter() {
             <div className="flex items-center gap-1">
               <button
                 onClick={handlePrevPage}
-                disabled={!prevChapter || currentPageIndex === 0}
+                disabled={currentPageIndex === 0}
                 className="p-1 text-medium-gray hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <span className="text-lg">‹</span>
@@ -95,7 +85,7 @@ function Chapter() {
               </span>
               <button
                 onClick={handleNextPage}
-                disabled={!nextChapter || currentPageIndex >= totalPages - 1}
+                disabled={currentPageIndex >= totalPages - 1}
                 className="p-1 text-medium-gray hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <span className="text-lg">›</span>
@@ -248,6 +238,58 @@ function Chapter() {
           )}
         </div>
       </main>
+    </>
+  );
+}
+
+function Chapter() {
+  const { id } = useParams();
+  const { chapter, errorChapter, isLoading } = useChapter({ id });
+  const { chapters } = useChaptersBySeries(
+    chapter?.series?.id ? String(chapter.series.id) : "",
+  );
+  const authContext = use(AuthContext);
+  const isAuthenticated = authContext?.isAuthenticated() ?? false;
+  const { readChapterIds, markAsRead, markAsUnread } = useReadingHistory(
+    chapter?.idSeries,
+  );
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
+  const currentIndex = chapters.findIndex((c) => c.id === id);
+  const prevChapter =
+    currentIndex >= 0 && currentIndex < chapters.length - 1
+      ? chapters[currentIndex + 1]
+      : null;
+  const nextChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
+
+  const { viewMode, setViewMode } = useConfig();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-medium-gray">loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {errorChapter && <p className="text-primary">{errorChapter}</p>}
+      <ChapterReader
+        key={chapter?.id ?? "chapter"}
+        chapter={chapter}
+        prevChapter={prevChapter}
+        nextChapter={nextChapter}
+        isAuthenticated={isAuthenticated}
+        readChapterIds={readChapterIds}
+        markAsRead={markAsRead}
+        markAsUnread={markAsUnread}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+      />
     </>
   );
 }
