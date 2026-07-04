@@ -60,7 +60,7 @@ class ChaptersDao implements IChaptersRepo {
           },
         },
         _count: {
-          select: { pages: true },
+          select: { media: true },
         },
       },
     });
@@ -73,7 +73,7 @@ class ChaptersDao implements IChaptersRepo {
       groupNum: groupNum ?? null,
       groupTitle: groupTitle ?? null,
       series,
-      pagesCount: _count.pages,
+      mediaCount: _count.media,
     }));
   }
 
@@ -81,7 +81,7 @@ class ChaptersDao implements IChaptersRepo {
     return await this.client.chapter.findUnique({
       where: { id },
       include: {
-        pages: true,
+        media: true,
         series: true,
       },
     });

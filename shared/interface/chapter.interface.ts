@@ -1,5 +1,5 @@
 import type { ISeries } from "./series.interface.ts";
-import type { IPages } from "./pages.interface.ts";
+import type { IMedia } from "./pages.interface.ts";
 
 export interface IChapter {
   id?: string;
@@ -7,8 +7,8 @@ export interface IChapter {
   number: number;
   series?: Partial<ISeries>;
   idSeries: string;
-  pages?: IPages[];
-  pagesCount?: number;
+  media?: IMedia[];
+  mediaCount?: number;
   createdAt?: Date;
   groupNum?: number | null;
   groupTitle?: string | null;

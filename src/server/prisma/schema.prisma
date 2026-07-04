@@ -30,6 +30,11 @@ enum TypePermission {
   DELETE
 }
 
+enum MediaType {
+  IMAGE
+  EPUB
+}
+
 model Permissions {
   id              String            @id @default(cuid())
   name            String
@@ -110,7 +115,7 @@ model Chapter {
   id        String    @id @default(cuid())
   series    Series    @relation(fields: [idSeries], references: [id])
   idSeries  String
-  pages     Pages[]
+  media     Media[]
   title     String
   number    Float
   groupNum    Float?
@@ -119,14 +124,14 @@ model Chapter {
   readBy    ReadChapters[]
 }
 
-model Pages {
-  id         String   @id @default(cuid())
-  chapter    Chapter  @relation(fields: [idChapter], references: [id])
+model Media {
+  id         String    @id @default(cuid())
+  chapter    Chapter   @relation(fields: [idChapter], references: [id])
   idChapter  String
   pageNumber Float
   url        String
   type       String
-  createdAt  DateTime @default(now())
+  createdAt  DateTime  @default(now())
 }
 
 model FollowingSeries {

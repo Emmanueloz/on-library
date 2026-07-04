@@ -14,5 +14,12 @@ const ALLOWED_IMAGE_TYPES = [
   "image/webp",
 ];
 
+const ALLOWED_EPUB_TYPES = [
+  "application/epub+zip",
+  "application/octet-stream",
+];
 
-export { MEDIA_DIR, ALLOWED_IMAGE_TYPES, DIRNAME_PROJECT };
+const MAX_EPUB_SIZE = 100 * 1024 * 1024;
+
+
+export { MEDIA_DIR, ALLOWED_IMAGE_TYPES, ALLOWED_EPUB_TYPES, MAX_EPUB_SIZE, DIRNAME_PROJECT };

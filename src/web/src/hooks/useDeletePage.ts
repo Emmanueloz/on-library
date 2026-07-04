@@ -20,7 +20,7 @@ const useDeletePage = () => {
     try {
       const headers = buildAuthHeaders(token, isAuthenticated(),false);
       const res = await fetch(
-        `${configEnv.apiUrl}/api/chapters/${idChapter}/pages/${pageId}`,
+        `${configEnv.apiUrl}/api/chapters/${idChapter}/media/${pageId}`,
         {
           method: "DELETE",
           headers,

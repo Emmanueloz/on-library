@@ -23,7 +23,7 @@ function ChapterInfoForm({ chapter, onUpdated }: ChapterInfoFormProps) {
       await updateChapter(chapter.id, {
         title: title.trim(),
         number,
-        groupNum: groupNum !== "" ? Number(groupNum) : "",
+        groupNum: groupNum !== "" ? Number(groupNum) : null,
         groupTitle: groupTitle || "",
       });
       onUpdated();

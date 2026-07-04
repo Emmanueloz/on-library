@@ -11,9 +11,9 @@ import { CategoriesDao } from "../dao/categories-dao.ts";
 import { ChaptersDao } from "../dao/chapters-dao.ts";
 import { ChaptersService } from "../../application/features/chapters/chapters-service.ts";
 import { XlsxSpreadsheetParser } from "../services/xlsx-spreadsheet-parser.ts";
-import { PagesDao } from "../dao/pages-dao.ts";
-import { PagesService } from "../../application/features/pages/pages-service.ts";
-import { FilesystemImageStorage } from "../services/filesystem-image-storage.ts";
+import { MediaDao } from "../dao/media-dao.ts";
+import { MediaService } from "../../application/features/media/media-service.ts";
+import { FilesystemMediaStorage } from "../services/filesystem-media-storage.ts";
 import { MEDIA_DIR } from "../constants/index.ts";
 import { LibrariesService } from "../../application/features/libraries/libraries-service.ts";
 import type { ILibrariesRepo } from "../../application/features/libraries/libraries-repo.ts";
@@ -39,7 +39,7 @@ declare module "fastify" {
     tagsService: TagsServices;
     categoriesService: CategoriesServices;
     chaptersService: ChaptersService;
-    pagesService: PagesService;
+    pagesService: MediaService;
     librariesService: LibrariesService;
     authService: AuthService;
     usersService: UsersService;
@@ -62,9 +62,9 @@ export default fp(async (fastify: FastifyInstance) => {
   const spreadsheetParser = new XlsxSpreadsheetParser();
   const chaptersService = new ChaptersService(chaptersRepo, spreadsheetParser);
 
-  const imageStorage = new FilesystemImageStorage(MEDIA_DIR);
-  const pagesRepo = new PagesDao(fastify.prisma);
-  const pagesService = new PagesService(pagesRepo, imageStorage);
+  const imageStorage = new FilesystemMediaStorage(MEDIA_DIR);
+  const mediaRepo = new MediaDao(fastify.prisma);
+  const mediaService = new MediaService(mediaRepo, imageStorage);
 
   const librariesRepo: ILibrariesRepo = new LibrariesDao(fastify.prisma);
   const librariesService = new LibrariesService(librariesRepo);
@@ -87,7 +87,7 @@ export default fp(async (fastify: FastifyInstance) => {
   fastify.decorate("tagsService", tagsService);
   fastify.decorate("categoriesService", categoriesService);
   fastify.decorate("chaptersService", chaptersService);
-  fastify.decorate("pagesService", pagesService);
+  fastify.decorate("pagesService", mediaService);
   fastify.decorate("librariesService", librariesService);
   fastify.decorate("authService", authService);
   fastify.decorate("usersService", usersService);

@@ -387,7 +387,7 @@ function EditSerieForm({ serie, id }: { serie: ISeries; id: string }) {
                         {chapter.groupTitle || "—"}
                       </td>
                       <td className="px-3 py-2 text-medium-gray">
-                        {chapter.pagesCount || 0}
+                        {chapter.mediaCount || 0}
                       </td>
                       <td className="px-3 py-2 text-right">
                         <Link

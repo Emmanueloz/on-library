@@ -6,6 +6,7 @@ import { useConfig, type ViewMode } from "../hooks/useConfig";
 import { useReadingHistory } from "../hooks/useReadingHistory";
 import { AuthContext } from "../context/AuthContex";
 import { LazyImage } from "../components/common/LazyImage";
+import { EpubReader } from "../components/chapter/EpubReader";
 import { use } from "react";
 
 function ChapterReader(props: {
@@ -34,8 +35,11 @@ function ChapterReader(props: {
   const [showSettings, setShowSettings] = useState(false);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
-  const totalPages = chapter?.pages?.length || 0;
-  const currentPage = chapter?.pages?.[currentPageIndex];
+  const hasEpub = chapter?.media?.some((m) => m.type === "EPUB");
+  const epubMedia = chapter?.media?.find((m) => m.type === "EPUB");
+  const imageMedia = chapter?.media?.filter((m) => m.type === "IMAGE") ?? [];
+  const totalPages = imageMedia.length;
+  const currentPage = imageMedia[currentPageIndex];
 
   const handlePrevPage = () => {
     if (currentPageIndex > 0) {
@@ -73,23 +77,27 @@ function ChapterReader(props: {
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPageIndex === 0}
-                className="p-1 text-medium-gray hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <span className="text-lg">‹</span>
-              </button>
-              <span className="text-xs text-dim-gray">
-                {currentPageIndex + 1} / {totalPages}
-              </span>
-              <button
-                onClick={handleNextPage}
-                disabled={currentPageIndex >= totalPages - 1}
-                className="p-1 text-medium-gray hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <span className="text-lg">›</span>
-              </button>
+              {!hasEpub && (
+                <>
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPageIndex === 0}
+                    className="p-1 text-medium-gray hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <span className="text-lg">‹</span>
+                  </button>
+                  <span className="text-xs text-dim-gray">
+                    {currentPageIndex + 1} / {totalPages}
+                  </span>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPageIndex >= totalPages - 1}
+                    className="p-1 text-medium-gray hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <span className="text-lg">›</span>
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="relative">
@@ -148,7 +156,9 @@ function ChapterReader(props: {
       </div>
 
       <main className="w-full h-full mt-14 bg-neutral-900 flex flex-col items-center">
-        {viewMode === "page-by-page" ? (
+        {hasEpub && epubMedia ? (
+          <EpubReader url={epubMedia.url} />
+        ) : viewMode === "page-by-page" ? (
           <div className="relative w-full h-[calc(100vh-56px)] flex items-center justify-center">
             <button
               onClick={handleNextPage}
@@ -176,7 +186,7 @@ function ChapterReader(props: {
           </div>
         ) : (
           <div className="max-w-3xl w-full flex flex-col gap-0">
-            {chapter?.pages?.map((p) => (
+            {imageMedia.map((p) => (
               <LazyImage
                 key={p.id}
                 className="w-full"
