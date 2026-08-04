@@ -39,6 +39,24 @@ class SeriesDao implements ISeriesRepo {
         },
         chapters: {
           orderBy: [{ groupNum: "asc" }, { number: "asc" }],
+          where: {
+            media: { some: {} },
+          },
+        },
+      },
+    });
+  }
+
+  async getRecent(limit: number): Promise<ISeries[]> {
+    return await this.client.series.findMany({
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      include: {
+        category: true,
+        tagsOnSeries: {
+          include: {
+            tag: true,
+          },
         },
       },
     });

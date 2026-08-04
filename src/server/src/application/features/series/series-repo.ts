@@ -5,6 +5,7 @@ import type { ICreateSerie, IUpdateSeries } from "./serie.interface.ts";
 interface ISeriesRepo {
   query(q?: IQuerySeries): Promise<ISeries[]>;
   getById(id: string): Promise<ISeries | null>;
+  getRecent(limit: number): Promise<ISeries[]>;
   create(series: ICreateSerie): Promise<ISeries>;
   update(id: string, series: IUpdateSeries): Promise<ISeries | null>;
   delete(id: string): Promise<void>;

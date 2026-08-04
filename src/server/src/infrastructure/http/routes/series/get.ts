@@ -1,8 +1,15 @@
 import type { FastifyInstance } from "fastify";
+import Type from "typebox";
 import { SeriesSchema } from "../../schemas/series/index.ts";
 import type {
   SerieIdType,
 } from "../../schemas/series/params.ts";
+
+const RecentSeriesQuery = Type.Object({
+  limit: Type.Optional(Type.Number({ minimum: 1, maximum: 50, default: 12 })),
+});
+
+type RecentSeriesQueryType = Type.Static<typeof RecentSeriesQuery>;
 
 export default async function (fastify: FastifyInstance) {
   fastify.get(
@@ -17,6 +24,27 @@ export default async function (fastify: FastifyInstance) {
 
       return {
         message: "Series",
+        data: series,
+      };
+    },
+  );
+
+  fastify.get<{
+    Querystring: RecentSeriesQueryType;
+  }>(
+    "/recent",
+    {
+      schema: {
+        tags: ["Series"],
+        querystring: RecentSeriesQuery,
+      },
+    },
+    async (request, reply) => {
+      const limit = request.query.limit ?? 12;
+      const series = await fastify.seriesService.getRecent(limit);
+
+      return {
+        message: "Recent series",
         data: series,
       };
     },

@@ -24,6 +24,7 @@ function UploadImagesModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const entriesRef = useRef(entries);
 
@@ -39,14 +40,28 @@ function UploadImagesModal({
     };
   }, []);
 
-  const addFiles = useCallback((newFiles: File[]) => {
+  const addFiles = useCallback(async (newFiles: File[]) => {
     const imageTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
     const filtered = newFiles.filter((f) => imageTypes.includes(f.type));
-    const newEntries = filtered.map((file) => ({
-      file,
-      previewUrl: URL.createObjectURL(file),
-    }));
-    setEntries((prev) => [...prev, ...newEntries]);
+    if (filtered.length === 0) return;
+
+    setIsProcessing(true);
+
+    const BATCH_SIZE = 20;
+    for (let i = 0; i < filtered.length; i += BATCH_SIZE) {
+      const batch = filtered.slice(i, i + BATCH_SIZE);
+      const newEntries = batch.map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+      setEntries((prev) => [...prev, ...newEntries]);
+
+      if (i + BATCH_SIZE < filtered.length) {
+        await new Promise((r) => setTimeout(r, 0));
+      }
+    }
+
+    setIsProcessing(false);
   }, []);
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,36 +131,47 @@ function UploadImagesModal({
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          <div
-            ref={dropRef}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-              isDragOver
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
-            }`}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/png,image/jpeg,image/jpg,image/webp"
-              onChange={handleFileInput}
-              className="hidden"
-            />
-            <div className="space-y-2">
-              <span className="text-4xl text-dim-gray">+</span>
-              <p className="text-sm text-medium-gray">
-                {isDragOver
-                  ? "Drop images here"
-                  : "Click to select or drag images here"}
-              </p>
-              <p className="text-xs text-dim-gray">PNG, JPG, WEBP</p>
+          {!isProcessing && (
+            <div
+              ref={dropRef}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                isDragOver
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={handleFileInput}
+                className="hidden"
+              />
+              <div className="space-y-2">
+                <span className="text-4xl text-dim-gray">+</span>
+                <p className="text-sm text-medium-gray">
+                  {isDragOver
+                    ? "Drop images here"
+                    : "Click to select or drag images here"}
+                </p>
+                <p className="text-xs text-dim-gray">PNG, JPG, WEBP</p>
+              </div>
             </div>
-          </div>
+          )}
+
+          {isProcessing && gridItems.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm text-medium-gray mt-3">
+                Processing images...
+              </p>
+            </div>
+          )}
 
           {gridItems.length > 0 && (
             <ImageGrid

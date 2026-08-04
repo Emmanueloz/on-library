@@ -94,7 +94,7 @@ const useTags = () => {
 
   const deleteTag = async (tagId: string) => {
     try {
-      const headers = buildAuthHeaders(token, isAuthenticated());
+      const headers = buildAuthHeaders(token, isAuthenticated(),false);
       const res = await fetch(
         `${configEnv.apiUrl}/api/tags/${tagId}`,
         {

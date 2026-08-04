@@ -1,11 +1,10 @@
-import type { IChapter } from "@on-library/shared";
 
 interface IQueryChapters {
   title?: string;
   number?: number;
   idSeries?: string;
-  orderBy?: "number" | "createdAt";
-  orderType?: "asc" | "desc";
+  orderBy?: string;
+  orderType?: string;
 }
 
 export type { IQueryChapters };

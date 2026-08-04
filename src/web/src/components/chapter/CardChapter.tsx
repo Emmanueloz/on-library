@@ -1,5 +1,6 @@
 import type { IChapter } from "@on-library/shared";
 import { NavLink } from "react-router";
+import { timeAgo } from "../../utils/timeAgo";
 
 function CardChapter({ chapter }: { chapter: IChapter }) {
   return (
@@ -13,32 +14,42 @@ function CardChapter({ chapter }: { chapter: IChapter }) {
       <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
 
       <div className="absolute bottom-0 left-0 right-0 p-4 transition-opacity duration-200 group-hover:opacity-0">
-        <p className="text-[16px] font-semibold leading-[1.4] tracking-[0.2px] text-foreground">
+        {chapter.groupTitle && (
+          <p className="text-base font-semibold tracking-5 text-foreground">
+            {chapter.groupTitle}
+          </p>
+        )}
+        <p className="text-base font-semibold leading-5 tracking-2 text-foreground">
           {chapter.title}
         </p>
-        <p className="text-[14px] font-medium leading-[1.14] tracking-[0.2px] text-light-gray">
+        <p className="text-sm font-medium leading-5 tracking-wider text-light-gray">
           {chapter.series?.title}
         </p>
+        {chapter.createdAt && (
+          <p className="text-xs font-medium tracking-wide text-dim-gray mt-1">
+            {timeAgo(chapter.createdAt)}
+          </p>
+        )}
       </div>
 
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center gap-4 p-4">
         <NavLink
           to={`/serie/${chapter.idSeries}`}
-          className="px-6 py-3 text-sm font-semibold text-foreground border border-[rgba(255,255,255,0.2)] rounded-full hover:bg-white/10 transition-all duration-200 tracking-[0.3px]"
+          className="px-6 py-3 text-sm font-semibold text-foreground border border-[rgba(255,255,255,0.2)] rounded-full hover:bg-white/10 transition-all duration-200 tracking-wider"
         >
           Ir a la Serie
         </NavLink>
 
         <div className="text-center">
-          <p className="text-[12px] font-semibold tracking-[0.3px] text-primary mb-1">
+          <p className="text-sm font-semibold tracking-wider text-primary mb-1">
             CAP. {chapter.number}
           </p>
-          <p className="text-[14px] font-medium text-light-gray mb-2">
+          <p className="text-base font-medium text-light-gray mb-2">
             "{chapter.title}"
           </p>
           <NavLink
             to={`/chapter/${chapter.id}`}
-            className="text-[13px] font-semibold text-accent-blue hover:underline tracking-[0.3px]"
+            className="text-xs font-semibold text-accent-blue hover:underline tracking-wider"
           >
             → LEER AHORA
           </NavLink>

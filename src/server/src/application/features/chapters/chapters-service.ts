@@ -18,6 +18,9 @@ class ChaptersService {
   async getById(id: string): Promise<IChapter | null> {
     return await this.chaptersRepo.getById(id);
   }
+  async getLatestBySeries(limit: number): Promise<IChapter[]> {
+    return await this.chaptersRepo.getLatestBySeries(limit);
+  }
   async create(chapter: IChapter): Promise<IChapter> {
     return await this.chaptersRepo.create(chapter);
   }

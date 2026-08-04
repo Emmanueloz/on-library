@@ -19,3 +19,10 @@ export const ChaptersQuerySchema = Type.Object({
 });
 
 export type ChaptersQuerySchemaType = Type.Static<typeof ChaptersQuerySchema>;
+
+export const LatestBySeriesQuery = Type.Object({
+  limit: Type.Optional(Type.Number({ minimum: 1, maximum: 100, default: 20 })),
+});
+
+
+export type LatestBySeriesQueryType = Type.Static<typeof LatestBySeriesQuery>;

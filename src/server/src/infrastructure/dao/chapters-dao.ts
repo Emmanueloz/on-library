@@ -78,13 +78,59 @@ class ChaptersDao implements IChaptersRepo {
   }
 
   async getById(id: string): Promise<IChapter | null> {
-    return await this.client.chapter.findUnique({
+    const chapter = await this.client.chapter.findUnique({
       where: { id },
       include: {
         media: true,
         series: true,
       },
     });
+    
+    return chapter as IChapter | null;
+  }
+
+  async getLatestBySeries(limit: number): Promise<IChapter[]> {
+    const chapters = await this.client.chapter.findMany({
+      distinct: ['idSeries'],
+      orderBy: [{ createdAt: 'desc'},{groupNum: 'desc'}, { number: 'desc' }],
+      take: limit,
+      where: {
+        media: { some: {} },
+      },
+      select: {
+        id: true,
+        title: true,
+        number: true,
+        idSeries: true,
+        groupNum: true,
+        groupTitle: true,
+        createdAt: true,
+        series: {
+          select: {
+            id: true,
+            title: true,
+            pictureUrl: true,
+            category: { select: { name: true } },
+          },
+        },
+        _count: { select: { media: true } },
+      },
+    });
+
+    const result = chapters.map(
+      ({ id, title, number, idSeries, groupNum, groupTitle, series, _count }) => ({
+        id,
+        title,
+        number,
+        idSeries,
+        groupNum: groupNum ?? null,
+        groupTitle: groupTitle ?? null,
+        series,
+        mediaCount: _count.media,
+      })
+    );
+
+    return result as IChapter[];
   }
 
   async create(chapter: Omit<IChapter, "id">): Promise<IChapter> {

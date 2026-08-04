@@ -15,6 +15,9 @@ class SeriesService {
   async getById(id: string): Promise<ISeries | null> {
     return await this.seriesRepo.getById(id);
   }
+  async getRecent(limit: number): Promise<ISeries[]> {
+    return await this.seriesRepo.getRecent(limit);
+  }
   async create(series: ICreateSerie): Promise<ISeries> {
     return await this.seriesRepo.create(series);
   }

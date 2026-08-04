@@ -1,5 +1,5 @@
 import type { ISeries } from "./series.interface.ts";
-import type { IMedia } from "./pages.interface.ts";
+import type { IMedia } from "./media.interface.ts";
 
 export interface IChapter {
   id?: string;
