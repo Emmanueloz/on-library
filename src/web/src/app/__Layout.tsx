@@ -3,9 +3,15 @@ import { Nav } from "../components/common/Nav";
 
 function Layout() {
   return (
-    <div className="flex flex-col h-screen">
+    <div
+      className="grid h-dvh"
+      style={{
+        gridTemplateAreas: '"nav" "main"',
+        gridTemplateRows: "auto 1fr",
+      }}
+    >
       <Nav />
-      <main className="grow">
+      <main className="min-h-0 overflow-y-auto" style={{ gridArea: "main" }}>
         <Outlet />
       </main>
     </div>

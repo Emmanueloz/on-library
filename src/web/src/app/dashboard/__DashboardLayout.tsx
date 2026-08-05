@@ -17,7 +17,7 @@ function DashboardLayout() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-56px)]">
+    <div className="flex h-full">
       <Drawer />
       <section className="flex-1 overflow-y-auto p-6">
         <Outlet />

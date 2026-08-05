@@ -39,7 +39,7 @@ function EditChapter() {
 
   if (isLoadingChapter && !chapter) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="h-full bg-background flex items-center justify-center">
         <p className="text-medium-gray">Loading...</p>
       </div>
     );

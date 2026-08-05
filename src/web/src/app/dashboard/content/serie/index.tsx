@@ -8,7 +8,7 @@ function EditSerie() {
 
   if (isLoadingSerie || !serie) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="h-full bg-background flex items-center justify-center">
         <p className="text-medium-gray">loading...</p>
       </div>
     );

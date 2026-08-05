@@ -12,7 +12,10 @@ export function Nav() {
   const { isAuthenticated, isEditor } = authContext;
 
   return (
-    <nav className="bg-background px-6 py-4 flex h-14 items-center justify-between border-b border-border">
+    <nav
+      className="bg-background px-6 py-4 flex h-14 items-center justify-between border-b border-border"
+      style={{ gridArea: "nav" }}
+    >
       <div className="flex items-center gap-4">
         <div className="text-foreground text-xl font-semibold">On Library</div>
         <div className="hidden md:flex gap-6">

@@ -31,14 +31,14 @@ function Titles() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="h-full bg-background flex items-center justify-center">
         <p className="text-medium-gray">loading...</p>
       </div>
     );
   }
 
   return (
-    <main className="flex flex-1 overflow-hidden">
+    <section className="flex h-full overflow-hidden">
       <aside className="w-72 bg-surface border-r border-border flex flex-col h-full overflow-y-auto shrink-0">
         <div className="p-4 flex flex-col gap-6">
           <div className="flex items-center justify-between">
@@ -115,7 +115,7 @@ function Titles() {
           <p className="text-center text-dim-gray mt-8">No series found</p>
         )}
       </div>
-    </main>
+    </section>
   );
 }
 export { Titles };

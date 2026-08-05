@@ -109,7 +109,7 @@ function Serie() {
     <>
       {errorSerie ?? <p>{errorSerie}</p>}
 
-      <main className="p-6">
+      <section className="p-6">
         <section className="bg-surface border-[var(--color-border)/0.06] rounded-2xl p-6 mb-6 flex flex-col gap-4 hover:border-[var(--color-border)/0.12] transition-all duration-200">
           <div className="flex gap-6">
             <div className="shrink-0 w-50">
@@ -257,7 +257,7 @@ function Serie() {
             </div>
           )}
         </section>
-      </main>
+      </section>
 
       {showAddToLibrary && id && (
         <AddToLibraryModal

@@ -12,14 +12,14 @@ function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <p className="text-medium-gray">Cargando...</p>
       </div>
     );
   }
 
   return (
-    <main className="p-4 md:p-10 mx-auto">
+    <section className="p-4 md:p-10 mx-auto">
       {(errorChapters || errorSeries) && (
         <p className="text-primary mb-4">{errorChapters || errorSeries}</p>
       )}
@@ -68,7 +68,7 @@ function Home() {
           </p>
         )}
       </section>
-    </main>
+    </section>
   );
 }
 

@@ -4,6 +4,7 @@
 
 1. **NEVER auto-commit to git.** Only commit when the user explicitly requests it (e.g., "guarda", "commit", "sube"). Even if changes were requested and applied, the user must validate and explicitly ask to save before committing. Do NOT commit after every fix or change as a default behavior.
 2. **TypeScript only, no JavaScript.** All code is written in `.ts`/`.tsx`. Node executes `.ts` directly using `--experimental-transform-types`. Never use `.js` files or suggest switching to JS. Enums are preferred over `as const` objects.
+3. **Tailwind CSS: NO custom values, EVER.** It is FORBIDDEN to use arbitrary values with brackets in classes (e.g., `w-[500px]`, `bg-[#1b1c1e]`, `tracking-[0.2px]`, `shadow-[...]`) and forbidden to create new custom CSS classes/values for anything. Always use the values Tailwind CSS already provides out of the box (its default scale and the tokens already defined in `src/web/src/index.css`: `bg-surface`, `text-medium-gray`, `border-border`, `bg-primary`, `text-accent-blue`, etc.). When styling anything, always reach first for Tailwind's predefined values — they are already good enough. No exceptions.
 
 ## Quick Commands
 
@@ -79,6 +80,7 @@ shared/       → Common types, interfaces, enums (@on-library/shared)
 6. **No test suite**: No test scripts or test framework configured in any package
 7. **No CI/CD**: No GitHub Actions or similar workflows found
 8. **SQLite database**: `src/server/dev.db` is NOT committed to git (in `.gitignore`). Data is local-only.
+9. **Layout owns height and scroll**: `src/web/src/app/__Layout.tsx` defines a CSS grid (`gridTemplateAreas: '"nav" "main"'`, rows `auto 1fr`) via inline `style` — Tailwind 4 core has no `grid-template-areas` utilities and rule #3 forbids arbitrary class values, so inline style is the sanctioned way for this. The `<Nav />` (h-14) fills the `nav` area; the single `<main>` fills the rest (`min-h-0 overflow-y-auto`) and owns scrolling. Pages MUST NOT render their own `<main>` tag nor use `h-screen`/`min-h-screen`/`h-[calc(100vh-56px)]` hacks — inside a page, use `h-full` to fill the available area. Exception: the `/chapter/:id` reader route lives outside the Layout, so it may use full-viewport sizing.
 
 ## Database Safety Rules
 

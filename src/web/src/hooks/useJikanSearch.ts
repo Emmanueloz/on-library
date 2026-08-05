@@ -30,6 +30,10 @@ interface JikanResponse {
 }
 
 const useJikanSearch = () => {
+
+  //const baseUrl = "https://api.jikan.moe/v4/manga";
+  const baseUrl = "https://api.tenrai.org/v1/manga";
+
   const [images, setImages] = useState<JikanManga[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +52,7 @@ const useJikanSearch = () => {
 
     try {
       const response = await ky.get(
-        `https://api.jikan.moe/v4/manga`,
+        `${baseUrl}`,
         { searchParams: { q: query, limit: 20 } }
       ).json<JikanResponse>();
 
@@ -72,7 +76,7 @@ const useJikanSearch = () => {
 
     try {
       const response = await ky.get(
-        `https://api.jikan.moe/v4/manga`,
+        `${baseUrl}`,
         { searchParams: { q: query, limit: 1 } }
       ).json<JikanResponse>();
 
