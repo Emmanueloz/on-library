@@ -17,13 +17,13 @@ class MediaDao implements IMediaRepo {
       orderBy: {
         pageNumber: "asc",
       },
-    });
+    }) as IMedia[];
   }
 
   async getById(id: string): Promise<IMedia | null> {
     return await this.client.media.findUnique({
       where: { id },
-    });
+    }) as IMedia | null;
   }
 
   async create(media: Omit<IMedia, "id" | "url"> & { url: string }): Promise<IMedia> {
@@ -34,7 +34,7 @@ class MediaDao implements IMediaRepo {
         type: media.type,
         url: media.url,
       },
-    });
+    }) as IMedia;
   }
 
   async update(id: string, media: Partial<IMedia> & { url?: string }): Promise<IMedia | null> {
@@ -47,7 +47,7 @@ class MediaDao implements IMediaRepo {
     return await this.client.media.update({
       where: { id },
       data,
-    });
+    }) as IMedia | null;
   }
 
   async delete(id: string): Promise<void> {

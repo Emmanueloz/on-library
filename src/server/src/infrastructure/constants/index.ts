@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const DIRNAME_PROJECT = join(__dirname, "../");
-const MEDIA_DIR = join(__dirname, "../../../media");
+const MEDIA_DIR = join(__dirname, "../../../uploads");
 
 
 const ALLOWED_IMAGE_TYPES = [

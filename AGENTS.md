@@ -45,7 +45,7 @@ shared/       → Common types, interfaces, enums (@on-library/shared)
 - **Architecture pattern**: `application/` (business logic, features) → `infrastructure/` (HTTP, DAOs, services)
 - **Dev mode**: `FASTIFY_AUTOLOAD_TYPESCRIPT=1 node --experimental-transform-types --watch src/index.ts`
 - **Swagger**: Available at `/documentation`
-- **Media files**: Served from `src/server/media/` at `/media/` prefix
+- **Media files**: Served from `src/server/uploads/` at `/media/` prefix
 - **Env**: `.env` with `DATABASE_URL="file:./dev.db"` and `SECRET_KEY`
 - **Seed**: `pnpm --filter server exec prisma db seed` → creates admin user (admin@onlibrary.com / Admin123!)
 
