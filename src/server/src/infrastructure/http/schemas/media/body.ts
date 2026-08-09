@@ -1,32 +1,30 @@
-type CreateMediaBodyType = {
-  file: {
-    type: "field" | "file";
-    fieldname?: string;
-    filename?: string;
-    value?: string;
-    mimetype?: string;
-    encoding?: string;
-    toBuffer(): Promise<Buffer>;
-  };
-  pageNumber: {
-    type: "field" | "file";
-    fieldname?: string;
-    filename?: string;
-    value?: string;
-    mimetype?: string;
-    encoding?: string;
-    toBuffer(): Promise<Buffer>;
-  };
-  type: {
-    type: "field" | "file";
-    fieldname?: string;
-    filename?: string;
-    value?: string;
-    mimetype?: string;
-    encoding?: string;
-    toBuffer(): Promise<Buffer>;
-  };
+type MediaFileType = {
+  type: "file";
+  fieldname?: string;
+  filename?: string;
+  mimetype?: string;
+  encoding?: string;
+  toBuffer(): Promise<Buffer>;
 };
 
-type UpdateMediaBodyType = Partial<CreateMediaBodyType>;
-export type { CreateMediaBodyType, UpdateMediaBodyType };
+type MediaFieldType = {
+  type: "field" | "file";
+  fieldname?: string;
+  filename?: string;
+  value?: string;
+  mimetype?: string;
+  encoding?: string;
+  toBuffer(): Promise<Buffer>;
+};
+
+type CreateMediaBatchBodyType = {
+  files: MediaFileType[] | MediaFileType;
+};
+
+type UpdateMediaBodyType = {
+  file?: MediaFileType;
+  pageNumber?: MediaFieldType;
+  type?: MediaFieldType;
+};
+
+export type { MediaFileType, CreateMediaBatchBodyType, UpdateMediaBodyType };

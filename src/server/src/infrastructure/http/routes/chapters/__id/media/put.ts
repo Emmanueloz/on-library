@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ChapterIdParamsType } from "../../../../schemas/chapters/params.ts";
 import type { MediaIdParamsType } from "../../../../schemas/media/params.ts";
-import { ALLOWED_IMAGE_TYPES } from "../../../../../constants/index.ts";
+import { ALLOWED_IMAGE_TYPES } from "@on-library/shared";
 import type { UpdateMediaBodyType } from "../../../../schemas/media/body.ts";
 
 export default async function (fastify: FastifyInstance) {
@@ -20,7 +20,7 @@ export default async function (fastify: FastifyInstance) {
     async (request, reply) => {
       const { mediaId, id: idChapter } = request.params;
 
-      const existingMedia = await fastify.pagesService.getById(mediaId);
+      const existingMedia = await fastify.mediaService.getById(mediaId);
       if (!existingMedia) {
         return reply.status(404).send({
           message: "Media not found",
@@ -51,7 +51,7 @@ export default async function (fastify: FastifyInstance) {
         params.baseUrl = `${request.protocol}://${request.host}`;
       }
 
-      const media = await fastify.pagesService.updateWithImage(params);
+      const media = await fastify.mediaService.updateWithImage(params);
       return {
         message: "Media updated",
         data: media,

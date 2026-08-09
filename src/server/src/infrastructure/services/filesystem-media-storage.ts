@@ -30,10 +30,15 @@ class FilesystemMediaStorage implements IMediaStorageRepo {
 
   async deleteMedia(url: string): Promise<void> {
     try {
-      await unlink(url);
+      const { pathname } = new URL(url);
+      const relativePath = pathname.replace(/^\/media\//, "");
+      await unlink(join(this.mediaDir, relativePath));
     } catch {
-      const filePath = new URL(url).pathname;
-      await unlink(join(this.mediaDir, filePath));
+      try {
+        await unlink(url);
+      } catch {
+        // File may not exist on disk
+      }
     }
   }
 

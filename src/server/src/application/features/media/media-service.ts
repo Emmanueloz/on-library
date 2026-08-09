@@ -15,79 +15,37 @@ class MediaService {
     return await this.mediaRepo.query(idChapter);
   }
 
+  async getChapterMediaType(idChapter: string): Promise<MediaType | null> {
+    const media = await this.mediaRepo.query(idChapter);
+
+    if (media.some((m) => m.type === MediaType.IMAGE)) {
+      return MediaType.IMAGE;
+    }
+
+    if (media.some((m) => m.type === MediaType.EPUB)) {
+      return MediaType.EPUB;
+    }
+
+    return null;
+  }
+
   async getById(id: string): Promise<IMedia | null> {
     return await this.mediaRepo.getById(id);
   }
 
-  async create(
-    media: Omit<IMedia, "id" | "url"> & { url: string },
-  ): Promise<IMedia> {
+  async create(media: Omit<IMedia, "id">): Promise<IMedia> {
     return await this.mediaRepo.create(media);
   }
 
   async update(
     id: string,
-    media: Partial<IMedia> & { url?: string },
+    media: Partial<IMedia>,
   ): Promise<IMedia | null> {
     return await this.mediaRepo.update(id, media);
   }
 
   async delete(id: string): Promise<void> {
     return await this.mediaRepo.delete(id);
-  }
-
-  async createWithImage(params: {
-    idChapter: string;
-    pageNumber: number;
-    type: MediaType;
-    fileName: string;
-    buffer: Buffer;
-    baseUrl?: string;
-  }): Promise<IMedia> {
-    const fileName = this.mediaStorage.generateFileName(params.fileName);
-    const url = await this.mediaStorage.saveMedia({
-      folder: params.idChapter,
-      fileName,
-      buffer: params.buffer,
-      baseUrl: params.baseUrl,
-    });
-
-    return await this.mediaRepo.create({
-      idChapter: params.idChapter,
-      pageNumber: params.pageNumber,
-      type: MediaType.IMAGE,
-      url,
-    });
-  }
-
-  async createWithEpub(params: {
-    idChapter: string;
-    fileName: string;
-    buffer: Buffer;
-    baseUrl?: string;
-  }): Promise<IMedia> {
-    const existingMedia = await this.mediaRepo.query(params.idChapter);
-    for (const m of existingMedia) {
-      if (m.type === MediaType.EPUB) {
-        await this.mediaStorage.deleteMedia(m.url);
-        await this.mediaRepo.delete(m.id!);
-      }
-    }
-
-    const fileName = this.mediaStorage.generateFileName(params.fileName);
-    const url = await this.mediaStorage.saveMedia({
-      folder: params.idChapter,
-      fileName,
-      buffer: params.buffer,
-      baseUrl: params.baseUrl,
-    });
-
-    return await this.mediaRepo.create({
-      idChapter: params.idChapter,
-      pageNumber: 0,
-      type: MediaType.EPUB,
-      url,
-    });
   }
 
   async updateWithImage(params: {
@@ -143,9 +101,9 @@ class MediaService {
     }
   }
 
-  async createManyWithImages(params: {
+  async createManyWithFiles(params: {
     idChapter: string;
-    pages: Array<{
+    files: Array<{
       pageNumber: number;
       type: MediaType;
       fileName: string;
@@ -155,19 +113,19 @@ class MediaService {
   }): Promise<IMedia[]> {
     const createdMedia: IMedia[] = [];
 
-    for (const page of params.pages) {
-      const fileName = this.mediaStorage.generateFileName(page.fileName);
+    for (const file of params.files) {
+      const fileName = this.mediaStorage.generateFileName(file.fileName);
       const url = await this.mediaStorage.saveMedia({
         folder: params.idChapter,
         fileName,
-        buffer: page.buffer,
+        buffer: file.buffer,
         baseUrl: params.baseUrl,
       });
 
       const created = await this.mediaRepo.create({
         idChapter: params.idChapter,
-        pageNumber: page.pageNumber,
-        type: MediaType.IMAGE,
+        pageNumber: file.pageNumber,
+        type: file.type,
         url,
       });
 

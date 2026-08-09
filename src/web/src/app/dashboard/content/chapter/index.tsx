@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import { MediaType } from "@on-library/shared";
 import { useChapterById } from "../../../../hooks/useChapterById";
 import { useDeletePage } from "../../../../hooks/useDeletePage";
 import { ChapterInfoForm } from "../../../../components/chapter/ChapterInfoForm";
-import { UploadImagesModal } from "../../../../components/chapter/UploadImagesModal";
-import { UploadEpubModal } from "../../../../components/chapter/UploadEpubModal";
+import { UploadMediaModal } from "../../../../components/chapter/UploadMediaModal";
 import { ImageGrid, type ImageItem } from "../../../../components/chapter/ImageGrid";
 
 function EditChapter() {
@@ -17,7 +17,6 @@ function EditChapter() {
   } = useChapterById(id);
   const { deletePage, isLoading: isDeleting } = useDeletePage();
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showUploadEpubModal, setShowUploadEpubModal] = useState(false);
 
   const handleConfirmDelete = async (pageIds: string[]) => {
     if (!id) return;
@@ -30,12 +29,21 @@ function EditChapter() {
   };
 
   const gridItems: ImageItem[] =
-    chapter?.media?.filter((m) => m.type === "IMAGE").map((page) => ({
-      id: page.id ?? String(page.pageNumber),
-      url: page.url,
-      label: `Page ${page.pageNumber}`,
-      pageNumber: page.pageNumber,
-    })) ?? [];
+    chapter?.media?.map((m) =>
+      m.type === MediaType.EPUB
+        ? {
+            id: m.id ?? "epub",
+            url: m.url,
+            label: "EPUB",
+            type: MediaType.EPUB,
+          }
+        : {
+            id: m.id ?? String(m.pageNumber),
+            url: m.url,
+            label: `Page ${m.pageNumber}`,
+            pageNumber: m.pageNumber,
+          },
+    ) ?? [];
 
   if (isLoadingChapter && !chapter) {
     return (
@@ -74,20 +82,12 @@ function EditChapter() {
                   ({chapter?.media?.length || 0})
                 </span>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowUploadEpubModal(true)}
-                  className="text-xs text-accent-blue hover:underline"
-                >
-                  + Upload EPUB
-                </button>
-                <button
-                  onClick={() => setShowUploadModal(true)}
-                  className="text-xs text-accent-blue hover:underline"
-                >
-                  + Upload Images
-                </button>
-              </div>
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="text-xs text-accent-blue hover:underline"
+              >
+                + Upload Media
+              </button>
             </div>
 
             <ImageGrid
@@ -115,7 +115,7 @@ function EditChapter() {
                   {chapter?.media?.length || 0}
                 </span>
               </div>
-              {chapter?.media?.some((m) => m.type === "EPUB") && (
+              {chapter?.media?.some((m) => m.type === MediaType.EPUB) && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-medium-gray">EPUB</span>
                   <span className="text-foreground font-medium">
@@ -141,17 +141,9 @@ function EditChapter() {
       </div>
 
       {showUploadModal && id && (
-        <UploadImagesModal
+        <UploadMediaModal
           chapterId={id}
           onClose={() => setShowUploadModal(false)}
-          onUploaded={refetchChapter}
-        />
-      )}
-
-      {showUploadEpubModal && id && (
-        <UploadEpubModal
-          chapterId={id}
-          onClose={() => setShowUploadEpubModal(false)}
           onUploaded={refetchChapter}
         />
       )}

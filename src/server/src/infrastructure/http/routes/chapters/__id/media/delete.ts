@@ -23,7 +23,7 @@ export default async function (fastify: FastifyInstance) {
     async (request, reply) => {
       const { mediaId } = request.params;
 
-      const existingMedia = await fastify.pagesService.getById(mediaId);
+      const existingMedia = await fastify.mediaService.getById(mediaId);
       if (!existingMedia) {
         return reply.status(404).send({
           message: "Media not found",
@@ -33,14 +33,14 @@ export default async function (fastify: FastifyInstance) {
       if (existingMedia.url) {
         try {
           const urlPath = new URL(existingMedia.url).pathname;
-          const filePath = join(MEDIA_DIR, urlPath);
+          const filePath = join(MEDIA_DIR, urlPath.replace(/^\/media\//, ""));
           await unlink(filePath);
         } catch (err) {
           console.error("Failed to delete file:", err);
         }
       }
 
-      await fastify.pagesService.delete(mediaId);
+      await fastify.mediaService.delete(mediaId);
 
       return {
         message: "Media deleted",

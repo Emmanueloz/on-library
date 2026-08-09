@@ -1,9 +1,8 @@
 import { use, useState } from "react";
 import { configEnv } from "../config";
 import { AuthContext } from "../context/AuthContex";
-//import { buildAuthHeaders } from "../utils/buildAuthHeaders";
 
-const useUploadPages = (idChapter: string) => {
+const useUploadMedia = (idChapter: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<unknown[] | null>(null);
@@ -12,9 +11,9 @@ const useUploadPages = (idChapter: string) => {
   if (!authContext) {
     throw new Error("AuthContext is not available");
   }
-  const { token} = authContext;
+  const { token } = authContext;
 
-  const uploadPages = async (files: File[]) => {
+  const uploadMedia = async (files: File[]) => {
     if (files.length === 0) {
       throw new Error("No files selected");
     }
@@ -28,23 +27,21 @@ const useUploadPages = (idChapter: string) => {
         formData.append("files", file);
       }
 
-      //const headers = buildAuthHeaders(token, isAuthenticated());
       const res = await fetch(
         `${configEnv.apiUrl}/api/chapters/${idChapter}/media/batch`,
         {
           method: "POST",
           body: formData,
           headers: {
-            //"Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
-          }
+          },
         },
       );
 
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.message || "Error uploading pages");
+        throw new Error(result.message || "Error uploading media");
       }
 
       setData(result.data);
@@ -57,7 +54,7 @@ const useUploadPages = (idChapter: string) => {
     }
   };
 
-  return { uploadPages, isLoading, error, data };
+  return { uploadMedia, isLoading, error, data };
 };
 
-export { useUploadPages };
+export { useUploadMedia };

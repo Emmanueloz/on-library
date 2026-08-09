@@ -26,7 +26,7 @@ class MediaDao implements IMediaRepo {
     }) as IMedia | null;
   }
 
-  async create(media: Omit<IMedia, "id" | "url"> & { url: string }): Promise<IMedia> {
+  async create(media: Omit<IMedia, "id">): Promise<IMedia> {
     return await this.client.media.create({
       data: {
         idChapter: media.idChapter,
@@ -37,7 +37,7 @@ class MediaDao implements IMediaRepo {
     }) as IMedia;
   }
 
-  async update(id: string, media: Partial<IMedia> & { url?: string }): Promise<IMedia | null> {
+  async update(id: string, media: Partial<IMedia>): Promise<IMedia | null> {
     const data: any = {};
 
     if (media.pageNumber !== undefined) data.pageNumber = media.pageNumber;

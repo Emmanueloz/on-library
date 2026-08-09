@@ -39,7 +39,7 @@ declare module "fastify" {
     tagsService: TagsServices;
     categoriesService: CategoriesServices;
     chaptersService: ChaptersService;
-    pagesService: MediaService;
+    mediaService: MediaService;
     librariesService: LibrariesService;
     authService: AuthService;
     usersService: UsersService;
@@ -87,7 +87,7 @@ export default fp(async (fastify: FastifyInstance) => {
   fastify.decorate("tagsService", tagsService);
   fastify.decorate("categoriesService", categoriesService);
   fastify.decorate("chaptersService", chaptersService);
-  fastify.decorate("pagesService", mediaService);
+  fastify.decorate("mediaService", mediaService);
   fastify.decorate("librariesService", librariesService);
   fastify.decorate("authService", authService);
   fastify.decorate("usersService", usersService);

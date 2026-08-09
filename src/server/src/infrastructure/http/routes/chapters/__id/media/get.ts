@@ -16,7 +16,7 @@ export default async function (fastify: FastifyInstance) {
     async (request, reply) => {
       const { id: idChapter } = request.params;
 
-      const media = await fastify.pagesService.query(idChapter);
+      const media = await fastify.mediaService.query(idChapter);
 
       return {
         message: "Media",
@@ -40,7 +40,7 @@ export default async function (fastify: FastifyInstance) {
     async (request, reply) => {
       const { mediaId } = request.params;
 
-      const media = await fastify.pagesService.getById(mediaId);
+      const media = await fastify.mediaService.getById(mediaId);
 
       if (!media) {
         return reply.status(404).send({

@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { MediaType } from "@on-library/shared";
 
 interface ImageItem {
   id: string;
   url: string;
   label: string;
   pageNumber?: number;
+  type?: MediaType;
 }
 
 interface ImageGridProps {
@@ -49,9 +51,9 @@ function ImageGrid({
   const emptyState = mode === "page" ? (
     <div className="col-span-full flex flex-col items-center justify-center py-12 border-2 border-dashed border-border rounded-xl">
       <span className="text-4xl text-dim-gray mb-2">📄</span>
-      <p className="text-sm text-dim-gray">No pages uploaded yet</p>
+      <p className="text-sm text-dim-gray">No media uploaded yet</p>
       <p className="text-xs text-dim-gray mt-1">
-        Click &quot;Upload Images&quot; to add pages
+        Click &quot;Upload Media&quot; to add pages or an EPUB
       </p>
     </div>
   ) : (
@@ -67,7 +69,7 @@ function ImageGrid({
       {mode === "page" && pendingDelete.size > 0 && (
         <div className="flex items-center justify-between bg-danger/10 border border-danger/20 rounded-lg px-4 py-2">
           <span className="text-xs text-danger">
-            {pendingDelete.size} image{pendingDelete.size > 1 ? "s" : ""} marked
+            {pendingDelete.size} item{pendingDelete.size > 1 ? "s" : ""} marked
             for deletion
           </span>
           <button
@@ -96,11 +98,20 @@ function ImageGrid({
               }`}
             >
               <div className="aspect-3/4 bg-background">
-                <img
-                  src={item.url}
-                  alt={item.label}
-                  className="w-full h-full object-cover"
-                />
+                {item.type === MediaType.EPUB ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-surface">
+                    <span className="text-4xl">📚</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-medium-gray">
+                      EPUB
+                    </span>
+                  </div>
+                ) : (
+                  <img
+                    src={item.url}
+                    alt={item.label}
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
 
               <div className="p-2 bg-surface">
