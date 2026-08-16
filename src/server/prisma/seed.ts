@@ -1,7 +1,16 @@
-import { PrismaClient } from "../prisma/prisma-client/client.ts";
+import { PrismaClient, UserRole } from "../prisma/prisma-client/client.ts";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { BcryptService } from "../src/infrastructure/security/bcryptService.ts";
 import { ModulePermission, TypePermission } from "@on-library/shared";
+
+
+
+const userAdmin ={
+  username: process.env.USERNAME_ADMIN,
+  email: process.env.EMAIL_ADMIN,
+  password: process.env.PASSWORD_ADMIN,
+}
+
 
 const prisma = new PrismaClient({
   adapter: new PrismaBetterSqlite3({
@@ -17,6 +26,11 @@ const permissionTypes = Object.values(TypePermission);
 
 async function main() {
   console.log("Starting seed...");
+
+  if (!userAdmin.username || !userAdmin.email || !userAdmin.password) {
+    console.error("Admin user credentials are not set in environment variables.");
+    process.exit(1);
+  }
 
   for (const module of modules) {
     for (const type of permissionTypes) {
@@ -38,8 +52,8 @@ async function main() {
   }
   console.log("Permissions created/updated");
 
-  const existingAdmin = await prisma.user.findUnique({
-    where: { email: "admin@onlibrary.com" },
+  const existingAdmin = await prisma.user.findFirst({
+    where: { role: UserRole.ROOT },
   });
 
   if (!existingAdmin) {
@@ -51,12 +65,13 @@ async function main() {
 
     await prisma.user.create({
       data: {
-        username: "admin",
-        email: "admin@onlibrary.com",
-        password: await encryptionService.hashPassword("Admin123!"),
+        username: userAdmin.username,
+        email: userAdmin.email,
+        password: await encryptionService.hashPassword(userAdmin.password),
         userPermissions: {
           create: adminPermissions,
         },
+        role: "ROOT",
       },
     });
     console.log("Admin user created with all permissions");
