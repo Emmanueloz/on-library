@@ -5,7 +5,10 @@ import { useChapterById } from "../../../../hooks/useChapterById";
 import { useDeletePage } from "../../../../hooks/useDeletePage";
 import { ChapterInfoForm } from "../../../../components/chapter/ChapterInfoForm";
 import { UploadMediaModal } from "../../../../components/chapter/UploadMediaModal";
-import { ImageGrid, type ImageItem } from "../../../../components/chapter/ImageGrid";
+import {
+  ImageGrid,
+  type ImageItem,
+} from "../../../../components/chapter/ImageGrid";
 
 function EditChapter() {
   const { id } = useParams();
@@ -54,8 +57,8 @@ function EditChapter() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
+    <div className="grid grid-cols-4 gap-4">
+      <div className="col-span-4 flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
           className="text-medium-gray hover:text-white transition-colors"
@@ -65,80 +68,78 @@ function EditChapter() {
         <h1 className="text-2xl font-semibold text-foreground">Edit Chapter</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-8 space-y-6">
-          {chapter && (
-            <ChapterInfoForm chapter={chapter} onUpdated={refetchChapter} />
-          )}
+      {chapter && (
+        <ChapterInfoForm
+          chapter={chapter}
+          onUpdated={refetchChapter}
+          className="col-span-3"
+        />
+      )}
 
-          <section className="bg-surface border border-[var(--color-border)/0.06] rounded-xl p-6">
-            <div className="flex items-center justify-between border-b border-border pb-2 mb-4">
-              <div className="flex items-center gap-2 text-primary">
-                <span className="text-lg">📄</span>
-                <h3 className="font-semibold uppercase text-xs tracking-wider">
-                  Media
-                </h3>
-                <span className="text-xs text-dim-gray">
-                  ({chapter?.media?.length || 0})
-                </span>
-              </div>
-              <button
-                onClick={() => setShowUploadModal(true)}
-                className="text-xs text-accent-blue hover:underline"
-              >
-                + Upload Media
-              </button>
+      <div className="col-span-1">
+        <section className="bg-surface border border-[var(--color-border)/0.06] rounded-xl p-6">
+          <div className="flex items-center gap-2 text-primary border-b border-border pb-2 mb-4">
+            <span className="text-lg">📊</span>
+            <h3 className="font-semibold uppercase text-xs tracking-wider">
+              Chapter Details
+            </h3>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-medium-gray">Total Media</span>
+              <span className="text-foreground font-medium">
+                {chapter?.media?.length || 0}
+              </span>
             </div>
-
-            <ImageGrid
-              mode="page"
-              items={gridItems}
-              onConfirmDelete={handleConfirmDelete}
-              isDeleting={isDeleting}
-            />
-          </section>
-        </div>
-
-        <div className="lg:col-span-4">
-          <section className="bg-surface border border-[var(--color-border)/0.06] rounded-xl p-6">
-            <div className="flex items-center gap-2 text-primary border-b border-border pb-2 mb-4">
-              <span className="text-lg">📊</span>
-              <h3 className="font-semibold uppercase text-xs tracking-wider">
-                Chapter Details
-              </h3>
+            {chapter?.media?.some((m) => m.type === MediaType.EPUB) && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-medium-gray">EPUB</span>
+                <span className="text-foreground font-medium">✓ Uploaded</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-medium-gray">Chapter Number</span>
+              <span className="text-foreground font-medium">
+                {chapter?.number}
+              </span>
             </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-medium-gray">Total Media</span>
-                <span className="text-foreground font-medium">
-                  {chapter?.media?.length || 0}
-                </span>
-              </div>
-              {chapter?.media?.some((m) => m.type === MediaType.EPUB) && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-medium-gray">EPUB</span>
-                  <span className="text-foreground font-medium">
-                    ✓ Uploaded
-                  </span>
-                </div>
-              )}
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-medium-gray">Chapter Number</span>
-                <span className="text-foreground font-medium">
-                  {chapter?.number}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-medium-gray">Serie</span>
-                <span className="text-foreground font-medium">
-                  {chapter?.series?.title || "—"}
-                </span>
-              </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-medium-gray">Serie</span>
+              <span className="text-foreground font-medium">
+                {chapter?.series?.title || "—"}
+              </span>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
+
+      <section className="bg-surface border border-[var(--color-border)/0.06] rounded-xl p-6 col-span-4">
+        <div className="flex items-center justify-between border-b border-border pb-2 mb-4">
+          <div className="flex items-center gap-2 text-primary">
+            <span className="text-lg">📄</span>
+            <h3 className="font-semibold uppercase text-xs tracking-wider">
+              Media
+            </h3>
+            <span className="text-xs text-dim-gray">
+              ({chapter?.media?.length || 0})
+            </span>
+          </div>
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="text-xs text-accent-blue hover:underline"
+          >
+            + Upload Media
+          </button>
+        </div>
+
+        <ImageGrid
+          mode="page"
+          items={gridItems}
+          onConfirmDelete={handleConfirmDelete}
+          isDeleting={isDeleting}
+        />
+      </section>
 
       {showUploadModal && id && (
         <UploadMediaModal

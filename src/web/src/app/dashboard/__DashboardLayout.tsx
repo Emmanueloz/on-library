@@ -19,7 +19,7 @@ function DashboardLayout() {
   return (
     <div className="flex h-full">
       <Drawer />
-      <section className="flex-1 overflow-y-auto p-6">
+      <section className="flex-1 overflow-y-auto p-4 px-6">
         <Outlet />
       </section>
     </div>
