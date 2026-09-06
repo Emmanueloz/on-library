@@ -102,7 +102,7 @@ function PageByPageView({
     setPageIndex((i) => Math.min(totalPages - 1, i + 1));
 
   return (
-    <div className="w-full h-full flex flex-col m-2">
+    <div className="w-full h-full flex flex-col">
       <div>
         <button
           onClick={goToPrevPage}
@@ -125,7 +125,7 @@ function PageByPageView({
 
       <div
         ref={containerRef}
-        className="flex-1 min-h-0 flex items-center justify-center overflow-hidden"
+        className="flex-1 min-h-0 flex items-center justify-center overflow-hidden m-4"
       >
         {page && width > 0 && height > 0 && (
           <div
