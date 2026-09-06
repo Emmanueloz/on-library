@@ -12,8 +12,12 @@ const ALLOWED_EPUB_TYPES = [
   "application/octet-stream",
 ];
 
+const ALLOWED_PDF_TYPES = ["application/pdf"];
+
 const EPUB_MIMETYPE = "application/epub+zip";
 const EPUB_EXTENSION = ".epub";
+const PDF_MIMETYPE = "application/pdf";
+const PDF_EXTENSION = ".pdf";
 
 function detectMediaType(mimetype: string, filename: string): MediaType | null {
   if (ALLOWED_IMAGE_TYPES.includes(mimetype)) {
@@ -27,7 +31,19 @@ function detectMediaType(mimetype: string, filename: string): MediaType | null {
     return MediaType.EPUB;
   }
 
+  if (
+    mimetype === PDF_MIMETYPE ||
+    filename.toLowerCase().endsWith(PDF_EXTENSION)
+  ) {
+    return MediaType.PDF;
+  }
+
   return null;
 }
 
-export { ALLOWED_IMAGE_TYPES, ALLOWED_EPUB_TYPES, detectMediaType };
+export {
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_EPUB_TYPES,
+  ALLOWED_PDF_TYPES,
+  detectMediaType,
+};

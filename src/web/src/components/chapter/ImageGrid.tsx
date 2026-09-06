@@ -98,11 +98,13 @@ function ImageGrid({
               }`}
             >
               <div className="aspect-3/4 bg-background">
-                {item.type === MediaType.EPUB ? (
+                {item.type === MediaType.EPUB || item.type === MediaType.PDF ? (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-surface">
-                    <span className="text-4xl">📚</span>
+                    <span className="text-4xl">
+                      {item.type === MediaType.PDF ? "📄" : "📚"}
+                    </span>
                     <span className="text-xs font-semibold uppercase tracking-wider text-medium-gray">
-                      EPUB
+                      {item.type}
                     </span>
                   </div>
                 ) : (

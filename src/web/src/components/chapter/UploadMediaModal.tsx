@@ -14,7 +14,8 @@ interface UploadMediaModalProps {
   onUploaded: () => void;
 }
 
-const ACCEPT_TYPES = "image/png,image/jpeg,image/jpg,image/webp,.epub,application/epub+zip";
+const ACCEPT_TYPES =
+  "image/png,image/jpeg,image/jpg,image/webp,.epub,application/epub+zip,.pdf,application/pdf";
 
 function UploadMediaModal({
   chapterId,
@@ -24,7 +25,7 @@ function UploadMediaModal({
   const { uploadMedia, isLoading: isUploading, error: uploadError } =
     useUploadMedia(chapterId);
   const [imageEntries, setImageEntries] = useState<ImageEntry[]>([]);
-  const [epubFile, setEpubFile] = useState<File | null>(null);
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -48,15 +49,15 @@ function UploadMediaModal({
   const addFiles = useCallback(
     async (newFiles: File[]) => {
       const images: File[] = [];
-      const epubs: File[] = [];
+      const documents: File[] = [];
       let rejected = 0;
 
       for (const file of newFiles) {
         const type = detectMediaType(file.type, file.name);
         if (type === MediaType.IMAGE) {
           images.push(file);
-        } else if (type === MediaType.EPUB) {
-          epubs.push(file);
+        } else if (type === MediaType.EPUB || type === MediaType.PDF) {
+          documents.push(file);
         } else {
           rejected++;
         }
@@ -64,11 +65,11 @@ function UploadMediaModal({
 
       if (images.length > 0) {
         // Images take precedence: only one file type per upload
-        if (epubFile) {
-          setEpubFile(null);
-          setAlertMessage("EPUB removed: only one file type per upload");
-        } else if (epubs.length > 0) {
-          setAlertMessage("EPUB ignored: only one file type per upload");
+        if (documentFile) {
+          setDocumentFile(null);
+          setAlertMessage("Document removed: only one file type per upload");
+        } else if (documents.length > 0) {
+          setAlertMessage("Document ignored: only one file type per upload");
         } else {
           setAlertMessage(null);
         }
@@ -93,15 +94,17 @@ function UploadMediaModal({
         return;
       }
 
-      if (epubs.length > 0) {
+      if (documents.length > 0) {
         if (imageEntriesRef.current.length > 0) {
-          setAlertMessage("EPUB ignored: only one file type per upload");
-        } else if (epubFile) {
-          setAlertMessage("Only one EPUB file is allowed");
+          setAlertMessage("Document ignored: only one file type per upload");
+        } else if (documentFile) {
+          setAlertMessage("Only one document file is allowed (EPUB or PDF)");
         } else {
-          setEpubFile(epubs[0] ?? null);
+          setDocumentFile(documents[0] ?? null);
           setAlertMessage(
-            epubs.length > 1 ? "Only one EPUB file is allowed" : null,
+            documents.length > 1
+              ? "Only one document file is allowed (EPUB or PDF)"
+              : null,
           );
         }
         return;
@@ -109,11 +112,11 @@ function UploadMediaModal({
 
       if (rejected > 0) {
         setAlertMessage(
-          "Unsupported file type. Allowed: images (png, jpg, jpeg, webp) or EPUB",
+          "Unsupported file type. Allowed: images (png, jpg, jpeg, webp), EPUB or PDF",
         );
       }
     },
-    [epubFile],
+    [documentFile],
   );
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,14 +154,14 @@ function UploadMediaModal({
     });
   };
 
-  const handleRemoveEpub = () => {
-    setEpubFile(null);
+  const handleRemoveDocument = () => {
+    setDocumentFile(null);
     setAlertMessage(null);
   };
 
   const handleUpload = async () => {
-    const files = epubFile
-      ? [epubFile]
+    const files = documentFile
+      ? [documentFile]
       : imageEntries.map((entry) => entry.file);
     if (files.length === 0) return;
     try {
@@ -176,7 +179,11 @@ function UploadMediaModal({
     label: entry.file.name,
   }));
 
-  const selectedCount = epubFile ? 1 : imageEntries.length;
+  const documentType = documentFile
+    ? detectMediaType(documentFile.type, documentFile.name)
+    : null;
+
+  const selectedCount = documentFile ? 1 : imageEntries.length;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -223,7 +230,7 @@ function UploadMediaModal({
                     : "Click to select or drag files here"}
                 </p>
                 <p className="text-xs text-dim-gray">
-                  PNG, JPG, WEBP or a single EPUB
+                  PNG, JPG, WEBP or a single EPUB/PDF
                 </p>
               </div>
             </div>
@@ -244,21 +251,23 @@ function UploadMediaModal({
             </p>
           )}
 
-          {epubFile && (
+          {documentFile && (
             <div className="flex items-center justify-between bg-surface border border-border rounded-xl px-4 py-3">
               <div className="flex items-center gap-3 min-w-0">
-                <span className="text-2xl">📚</span>
+                <span className="text-2xl">
+                  {documentType === MediaType.PDF ? "📄" : "📚"}
+                </span>
                 <div className="min-w-0">
                   <p className="text-sm text-foreground truncate">
-                    {epubFile.name}
+                    {documentFile.name}
                   </p>
                   <p className="text-xs text-dim-gray">
-                    {(epubFile.size / (1024 * 1024)).toFixed(2)} MB
+                    {(documentFile.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                 </div>
               </div>
               <button
-                onClick={handleRemoveEpub}
+                onClick={handleRemoveDocument}
                 className="text-dim-gray hover:text-white transition-colors"
               >
                 ✕
@@ -281,8 +290,8 @@ function UploadMediaModal({
 
         <div className="px-6 py-4 border-t border-border flex items-center justify-between">
           <p className="text-xs text-dim-gray">
-            {epubFile
-              ? "1 EPUB selected"
+            {documentFile
+              ? `1 ${documentType === MediaType.PDF ? "PDF" : "EPUB"} selected`
               : `${imageEntries.length} image${imageEntries.length !== 1 ? "s" : ""} selected`}
           </p>
           <div className="flex gap-2">

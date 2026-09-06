@@ -47,14 +47,14 @@ export default async function (fastify: FastifyInstance) {
 
         if (!type) {
           return reply.status(400).send({
-            message: `Unsupported file type: ${fileName}. Allowed: images (png, jpg, jpeg, webp) or EPUB`,
+            message: `Unsupported file type: ${fileName}. Allowed: images (png, jpg, jpeg, webp), EPUB or PDF`,
           });
         }
 
         if (batchType && type !== batchType) {
           return reply.status(400).send({
             message:
-              "Mixed file types are not allowed. Upload only images or a single EPUB per request",
+              "Mixed file types are not allowed. Upload only images or a single document (EPUB/PDF) per request",
           });
         }
         batchType = type;
@@ -79,23 +79,31 @@ export default async function (fastify: FastifyInstance) {
         });
       }
 
-      if (batchType === MediaType.EPUB && filesData.length > 1) {
+      if (
+        (batchType === MediaType.EPUB || batchType === MediaType.PDF) &&
+        filesData.length > 1
+      ) {
         return reply.status(400).send({
-          message: "Only one EPUB file is allowed per request",
+          message: `Only one ${batchType} file is allowed per request`,
         });
       }
 
       const chapterMediaType =
         await fastify.mediaService.getChapterMediaType(idChapter);
 
-      if (chapterMediaType === MediaType.EPUB) {
+      if (
+        chapterMediaType === MediaType.EPUB ||
+        chapterMediaType === MediaType.PDF
+      ) {
         return reply.status(409).send({
-          message:
-            "This chapter already contains an EPUB. Only one EPUB file is allowed per chapter",
+          message: `This chapter already contains ${chapterMediaType} media. Only one document file is allowed per chapter`,
         });
       }
 
-      if (chapterMediaType === MediaType.IMAGE && batchType === MediaType.EPUB) {
+      if (
+        chapterMediaType === MediaType.IMAGE &&
+        (batchType === MediaType.EPUB || batchType === MediaType.PDF)
+      ) {
         return reply.status(409).send({
           message:
             "This chapter already contains images. Only image files can be uploaded",

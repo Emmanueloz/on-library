@@ -4,7 +4,7 @@ import fastifyAutoload from "@fastify/autoload";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import fastifyStatic from "@fastify/static";
-import fastifyPrisma from "@joggr/fastify-prisma";
+import fastifyPrisma from "@zrosenbauer/fastify-prisma";
 import fastifyMultipart from "@fastify/multipart";
 import fastifyCors from "@fastify/cors";
 import { ClientPrisma } from "./services/client-prisma.ts";

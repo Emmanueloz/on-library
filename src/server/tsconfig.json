@@ -15,12 +15,9 @@
     // "types": ["node"],
     // and npm install -D @types/node
 
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    // Type-check only: Node runs TS natively, never emit build artifacts
+    "noEmit": true,
     "allowImportingTsExtensions": true,
-    "emitDeclarationOnly": true,
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,

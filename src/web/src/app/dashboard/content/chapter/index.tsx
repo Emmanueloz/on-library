@@ -33,12 +33,12 @@ function EditChapter() {
 
   const gridItems: ImageItem[] =
     chapter?.media?.map((m) =>
-      m.type === MediaType.EPUB
+      m.type === MediaType.EPUB || m.type === MediaType.PDF
         ? {
-            id: m.id ?? "epub",
+            id: m.id ?? m.type,
             url: m.url,
-            label: "EPUB",
-            type: MediaType.EPUB,
+            label: m.type,
+            type: m.type,
           }
         : {
             id: m.id ?? String(m.pageNumber),
@@ -47,6 +47,11 @@ function EditChapter() {
             pageNumber: m.pageNumber,
           },
     ) ?? [];
+
+  const documentType =
+    chapter?.media?.find(
+      (m) => m.type === MediaType.EPUB || m.type === MediaType.PDF,
+    )?.type ?? null;
 
   if (isLoadingChapter && !chapter) {
     return (
@@ -92,9 +97,9 @@ function EditChapter() {
                 {chapter?.media?.length || 0}
               </span>
             </div>
-            {chapter?.media?.some((m) => m.type === MediaType.EPUB) && (
+            {documentType && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-medium-gray">EPUB</span>
+                <span className="text-medium-gray">{documentType}</span>
                 <span className="text-foreground font-medium">✓ Uploaded</span>
               </div>
             )}

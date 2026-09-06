@@ -26,6 +26,10 @@ class MediaService {
       return MediaType.EPUB;
     }
 
+    if (media.some((m) => m.type === MediaType.PDF)) {
+      return MediaType.PDF;
+    }
+
     return null;
   }
 

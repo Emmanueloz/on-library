@@ -4,6 +4,7 @@ import type { useChaptersBySeries } from "../../hooks/useChaptersBySeries";
 import type { ViewMode } from "../../hooks/useConfig";
 import { Link } from "react-router";
 import { EpubReader } from "./EpubReader";
+import { PdfReader } from "./PdfReader";
 import { LazyImage } from "../common/LazyImage";
 
 function ChapterReader(props: {
@@ -38,6 +39,7 @@ function ChapterReader(props: {
 
   const hasEpub = chapter?.media?.some((m) => m.type === "EPUB");
   const epubMedia = chapter?.media?.find((m) => m.type === "EPUB");
+  const pdfMedia = chapter?.media?.find((m) => m.type === "PDF");
   const imageMedia = chapter?.media?.filter((m) => m.type === "IMAGE") ?? [];
   const totalPages = imageMedia.length;
   const currentPage = imageMedia[currentPageIndex];
@@ -78,7 +80,7 @@ function ChapterReader(props: {
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              {!hasEpub && viewMode === "page-by-page" && (
+              {!hasEpub && !pdfMedia && viewMode === "page-by-page" && (
                 <>
                   <button
                     onClick={handlePrevPage}
@@ -159,6 +161,8 @@ function ChapterReader(props: {
       <main className="w-full h-full mt-14 bg-neutral-900 flex flex-col items-center">
         {hasEpub && epubMedia ? (
           <EpubReader url={epubMedia.url} />
+        ) : pdfMedia ? (
+          <PdfReader url={pdfMedia.url} viewMode={viewMode} />
         ) : viewMode === "page-by-page" ? (
           <div className="relative w-full h-[calc(100vh-56px)] flex items-center justify-center">
             <button
