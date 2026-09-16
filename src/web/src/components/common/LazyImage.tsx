@@ -48,15 +48,15 @@ function LazyImage({
   return (
     <div
       ref={imgRef}
-      className={`relative overflow-hidden bg-stone-800 ${className}`}
+      className={`relative overflow-hidden ${className}`}
       style={{ minHeight }}
     >
       {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-stone-700 animate-pulse" />
+        <div className="absolute inset-0 animate-pulse" />
       )}
 
       {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-stone-900">
+        <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-xs text-stone-500">Failed to load</span>
         </div>
       )}

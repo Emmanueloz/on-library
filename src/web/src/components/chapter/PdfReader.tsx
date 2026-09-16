@@ -16,12 +16,8 @@ import {
   RenderLayer,
   RenderPluginPackage,
 } from "@embedpdf/plugin-render/react";
-import type { ViewMode } from "../../hooks/useConfig";
+import type { PdfReaderProps } from "../../interfaces/pdfReaderProps.interface";
 
-interface PdfReaderProps {
-  url: string;
-  viewMode: ViewMode;
-}
 
 function createPlugins(url: string) {
   return [
