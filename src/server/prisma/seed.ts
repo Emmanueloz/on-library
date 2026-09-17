@@ -14,7 +14,7 @@ const userAdmin ={
 
 const prisma = new PrismaClient({
   adapter: new PrismaBetterSqlite3({
-    url: "./dev.db",
+    url: "./data/dev.db",
   }),
 });
 
