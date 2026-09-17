@@ -4,6 +4,8 @@ import { useChapter } from "../hooks/useChapter";
 import { useChaptersBySeries } from "../hooks/useChaptersBySeries";
 import { useConfig } from "../hooks/useConfig";
 import { useReadingHistory } from "../hooks/useReadingHistory";
+import { useFollowing } from "../hooks/useFollowing";
+import { useBookmarks } from "../hooks/useBookmarks";
 import { AuthContext } from "../context/AuthContex";
 
 import { use } from "react";
@@ -21,6 +23,14 @@ function Chapter() {
   const { readChapterIds, markAsRead, markAsUnread } = useReadingHistory(
     chapter?.idSeries,
   );
+  const { isFollowing } = useFollowing(chapter?.idSeries);
+  const canBookmark = isAuthenticated && isFollowing;
+  const {
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    removeAllBookmarks,
+  } = useBookmarks(chapter?.id, canBookmark);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -57,6 +67,11 @@ function Chapter() {
         markAsUnread={markAsUnread}
         viewMode={viewMode}
         setViewMode={setViewMode}
+        canBookmark={canBookmark}
+        bookmarks={bookmarks}
+        addBookmark={addBookmark}
+        removeBookmark={removeBookmark}
+        removeAllBookmarks={removeAllBookmarks}
       />
     </>
   );

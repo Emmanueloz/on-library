@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { useChapter } from "../../hooks/useChapter";
 import type { useChaptersBySeries } from "../../hooks/useChaptersBySeries";
 import type { ViewMode } from "../../hooks/useConfig";
@@ -6,6 +6,9 @@ import { Link } from "react-router";
 import { EpubReader } from "./EpubReader";
 import { PdfReader } from "./PdfReader";
 import { ImgReader } from "./ImgReader";
+import { BookmarkPanel } from "./bookmark/BookmarkPanel";
+import { BookmarkToast } from "./bookmark/BookmarkToast";
+import { MediaType, type IBookmark } from "@on-library/shared";
 
 function ChapterReader(props: {
   chapter: ReturnType<typeof useChapter>["chapter"];
@@ -21,6 +24,11 @@ function ChapterReader(props: {
   markAsUnread: (id: string) => void;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
+  canBookmark: boolean;
+  bookmarks: IBookmark[];
+  addBookmark: (type: MediaType, page: number) => Promise<boolean>;
+  removeBookmark: (id: string) => Promise<boolean>;
+  removeAllBookmarks: () => Promise<boolean>;
 }) {
   const {
     chapter,
@@ -32,14 +40,60 @@ function ChapterReader(props: {
     markAsUnread,
     viewMode,
     setViewMode,
+    canBookmark,
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    removeAllBookmarks,
   } = props;
 
   const [showSettings, setShowSettings] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [jumpTarget, setJumpTarget] = useState<{
+    page: number;
+    at: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+
+    const timeout = setTimeout(() => setToast(null), 2500);
+    return () => clearTimeout(timeout);
+  }, [toast]);
 
   const hasEpub = chapter?.media?.some((m) => m.type === "EPUB");
   const epubMedia = chapter?.media?.find((m) => m.type === "EPUB");
   const pdfMedia = chapter?.media?.find((m) => m.type === "PDF");
   const imageMedia = chapter?.media?.filter((m) => m.type === "IMAGE") ?? [];
+
+  const mediaType: MediaType = pdfMedia ? MediaType.PDF : MediaType.IMAGE;
+  const bookmarkedPages = new Set(bookmarks.map((b) => b.page));
+
+  const handleToggleBookmark = async (page: number) => {
+    const existing = bookmarks.find((b) => b.page === page);
+
+    if (existing?.id) {
+      const ok = await removeBookmark(existing.id);
+      setToast(ok ? "Bookmark removed" : "Failed to remove bookmark");
+    } else {
+      const ok = await addBookmark(mediaType, page);
+      setToast(ok ? "Bookmark saved" : "Failed to save bookmark");
+    }
+  };
+
+  const handleRemoveBookmark = async (id: string) => {
+    const ok = await removeBookmark(id);
+    setToast(ok ? "Bookmark removed" : "Failed to remove bookmark");
+  };
+
+  const handleRemoveAllBookmarks = async () => {
+    const ok = await removeAllBookmarks();
+    setToast(ok ? "All bookmarks removed" : "Failed to remove bookmarks");
+  };
+
+  const handleGoToBookmark = (page: number) => {
+    setJumpTarget({ page, at: Date.now() });
+  };
 
   return (
     <>
@@ -121,9 +175,23 @@ function ChapterReader(props: {
         {hasEpub && epubMedia ? (
           <EpubReader url={epubMedia.url} />
         ) : pdfMedia ? (
-          <PdfReader url={pdfMedia.url} viewMode={viewMode} />
+          <PdfReader
+            url={pdfMedia.url}
+            viewMode={viewMode}
+            canBookmark={canBookmark}
+            bookmarkedPages={bookmarkedPages}
+            onToggleBookmark={handleToggleBookmark}
+            jumpTarget={jumpTarget}
+          />
         ) : (
-          <ImgReader viewMode={viewMode} imageMedia={imageMedia} />
+          <ImgReader
+            viewMode={viewMode}
+            imageMedia={imageMedia}
+            canBookmark={canBookmark}
+            bookmarkedPages={bookmarkedPages}
+            onToggleBookmark={handleToggleBookmark}
+            jumpTarget={jumpTarget}
+          />
         )}
 
         <div className="w-full flex flex-col gap-2 items-center justify-center pt-4 pb-2">
@@ -180,6 +248,17 @@ function ChapterReader(props: {
           </Link>
         </div>
       </main>
+
+      {canBookmark && !hasEpub && (
+        <BookmarkPanel
+          bookmarks={bookmarks}
+          onGoTo={handleGoToBookmark}
+          onRemove={handleRemoveBookmark}
+          onRemoveAll={handleRemoveAllBookmarks}
+        />
+      )}
+
+      <BookmarkToast message={toast} />
     </>
   );
 }

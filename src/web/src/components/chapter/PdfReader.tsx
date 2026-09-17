@@ -11,13 +11,18 @@ import {
   Viewport,
   ViewportPluginPackage,
 } from "@embedpdf/plugin-viewport/react";
-import { Scroller, ScrollPluginPackage } from "@embedpdf/plugin-scroll/react";
+import {
+  Scroller,
+  ScrollPluginPackage,
+  useScroll,
+} from "@embedpdf/plugin-scroll/react";
 import {
   RenderLayer,
   RenderPluginPackage,
 } from "@embedpdf/plugin-render/react";
 import type { PdfReaderProps } from "../../interfaces/pdfReaderProps.interface";
-
+import type { BookmarkReaderProps } from "../../interfaces/bookmarkReaderProps.interface";
+import { BookmarkButton } from "./bookmark/BookmarkButton";
 
 function createPlugins(url: string) {
   return [
@@ -56,13 +61,42 @@ function useContainerSize(ref: React.RefObject<HTMLDivElement | null>) {
   return size;
 }
 
-function CascadeView({ documentId }: { documentId: string }) {
+function CascadeView({
+  documentId,
+  canBookmark = false,
+  bookmarkedPages,
+  onToggleBookmark,
+  jumpTarget,
+}: { documentId: string } & BookmarkReaderProps) {
+  const { provides: scroll } = useScroll(documentId);
+  const lastJumpRef = useRef<BookmarkReaderProps["jumpTarget"]>(null);
+
+  useEffect(() => {
+    if (!jumpTarget || !scroll) return;
+    if (lastJumpRef.current === jumpTarget) return;
+    lastJumpRef.current = jumpTarget;
+
+    // The Scroller virtualizes pages, so anchors may not exist in the DOM;
+    // scrollToPage computes the position from the layout metrics instead.
+    scroll.scrollToPage({ pageNumber: jumpTarget.page, behavior: "smooth" });
+  }, [jumpTarget, scroll]);
+
   return (
     <Viewport documentId={documentId} className="w-full h-full">
       <Scroller
         documentId={documentId}
         renderPage={({ width, height, pageIndex }) => (
-          <div style={{ width, height }}>
+          <div
+            id={`bookmark-page-${pageIndex + 1}`}
+            className="relative group"
+            style={{ width, height }}
+          >
+            {canBookmark && onToggleBookmark && (
+              <BookmarkButton
+                bookmarked={bookmarkedPages?.has(pageIndex + 1) ?? false}
+                onToggle={() => onToggleBookmark(pageIndex + 1)}
+              />
+            )}
             <RenderLayer documentId={documentId} pageIndex={pageIndex} />
           </div>
         )}
@@ -74,10 +108,14 @@ function CascadeView({ documentId }: { documentId: string }) {
 function PageByPageView({
   documentId,
   documentState,
+  canBookmark = false,
+  bookmarkedPages,
+  onToggleBookmark,
+  jumpTarget,
 }: {
   documentId: string;
   documentState: DocumentState;
-}) {
+} & BookmarkReaderProps) {
   const [pageIndex, setPageIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);
@@ -85,6 +123,17 @@ function PageByPageView({
   const pages = documentState.document?.pages ?? [];
   const totalPages = documentState.document?.pageCount ?? 0;
   const page = pages[pageIndex];
+
+  const [lastJumpTarget, setLastJumpTarget] = useState(jumpTarget);
+  if (jumpTarget !== lastJumpTarget) {
+    setLastJumpTarget(jumpTarget);
+    if (jumpTarget) {
+      const target = jumpTarget.page - 1;
+      if (target >= 0 && target < totalPages) {
+        setPageIndex(target);
+      }
+    }
+  }
 
   const pageWidth = page?.size.width ?? 1;
   const pageHeight = page?.size.height ?? 1;
@@ -98,7 +147,7 @@ function PageByPageView({
     setPageIndex((i) => Math.min(totalPages - 1, i + 1));
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="relative group w-full h-full flex flex-col">
       <div>
         <button
           onClick={goToPrevPage}
@@ -125,11 +174,18 @@ function PageByPageView({
       >
         {page && width > 0 && height > 0 && (
           <div
+          className="relative group"
             style={{
               width: pageWidth * scale,
               height: pageHeight * scale,
             }}
           >
+            {canBookmark && onToggleBookmark && (
+              <BookmarkButton
+                bookmarked={bookmarkedPages?.has(pageIndex + 1) ?? false}
+                onToggle={() => onToggleBookmark(pageIndex + 1)}
+              />
+            )}
             <RenderLayer
               documentId={documentId}
               pageIndex={pageIndex}
@@ -142,7 +198,14 @@ function PageByPageView({
   );
 }
 
-function PdfReader({ url, viewMode }: PdfReaderProps) {
+function PdfReader({
+  url,
+  viewMode,
+  canBookmark = false,
+  bookmarkedPages,
+  onToggleBookmark,
+  jumpTarget,
+}: PdfReaderProps) {
   const { engine, isLoading, error } = usePdfiumEngine();
   const [plugins] = useState(() => createPlugins(url));
 
@@ -189,11 +252,21 @@ function PdfReader({ url, viewMode }: PdfReaderProps) {
                   )}
                   {isLoaded &&
                     (viewMode === "cascade" ? (
-                      <CascadeView documentId={activeDocumentId} />
+                      <CascadeView
+                        documentId={activeDocumentId}
+                        canBookmark={canBookmark}
+                        bookmarkedPages={bookmarkedPages}
+                        onToggleBookmark={onToggleBookmark}
+                        jumpTarget={jumpTarget}
+                      />
                     ) : (
                       <PageByPageView
                         documentId={activeDocumentId}
                         documentState={documentState}
+                        canBookmark={canBookmark}
+                        bookmarkedPages={bookmarkedPages}
+                        onToggleBookmark={onToggleBookmark}
+                        jumpTarget={jumpTarget}
                       />
                     ))}
                 </>
