@@ -74,6 +74,10 @@ class AuthDao implements IAuthRepo {
             // Condición 4: Todos los de 'history'
             name: "history",
           },
+          {
+            // Condición 5: Todos los de 'bookmark'
+            name: "bookmark",
+          },
         ],
       },
     });

@@ -52,6 +52,35 @@ async function main() {
   }
   console.log("Permissions created/updated");
 
+  const bookmarkPermissions = await prisma.permissions.findMany({
+    where: { name: ModulePermission.Bookmark },
+  });
+
+  const allUsers = await prisma.user.findMany({
+    include: { userPermissions: true },
+  });
+
+  for (const user of allUsers) {
+    const ownedIds = new Set(user.userPermissions.map((up) => up.idPermission));
+    const missing = bookmarkPermissions.filter((p) => !ownedIds.has(p.id));
+
+    for (const permission of missing) {
+      await prisma.userPermissions.create({
+        data: {
+          idUser: user.id,
+          idPermission: permission.id,
+        },
+      });
+    }
+
+    if (missing.length > 0) {
+      console.log(
+        `Assigned ${missing.length} bookmark permissions to user ${user.email}`,
+      );
+    }
+  }
+  console.log("Bookmark permissions assigned to existing users");
+
   const existingAdmin = await prisma.user.findFirst({
     where: { role: UserRole.ROOT },
   });
