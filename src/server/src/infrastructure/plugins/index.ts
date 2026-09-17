@@ -32,6 +32,9 @@ import { FollowingDao } from "../dao/following-dao.ts";
 import { ReadingHistoryService } from "../../application/features/history/history-service.ts";
 import type { IReadChaptersRepo } from "../../application/features/history/history-repo.ts";
 import { ReadChaptersDao } from "../dao/history-dao.ts";
+import { BookmarkService } from "../../application/features/bookmark/bookmark-service.ts";
+import type { IBookmarkRepo } from "../../application/features/bookmark/bookmark-repo.ts";
+import { BookmarkDao } from "../dao/bookmark-dao.ts";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -45,6 +48,7 @@ declare module "fastify" {
     usersService: UsersService;
     followingService: FollowingService;
     readingHistoryService: ReadingHistoryService;
+    bookmarkService: BookmarkService;
   }
 }
 
@@ -83,6 +87,9 @@ export default fp(async (fastify: FastifyInstance) => {
   const readChaptersRepo: IReadChaptersRepo = new ReadChaptersDao(fastify.prisma);
   const readingHistoryService = new ReadingHistoryService(readChaptersRepo);
 
+  const bookmarkRepo: IBookmarkRepo = new BookmarkDao(fastify.prisma);
+  const bookmarkService = new BookmarkService(bookmarkRepo);
+
   fastify.decorate("seriesService", seriesService);
   fastify.decorate("tagsService", tagsService);
   fastify.decorate("categoriesService", categoriesService);
@@ -93,4 +100,5 @@ export default fp(async (fastify: FastifyInstance) => {
   fastify.decorate("usersService", usersService);
   fastify.decorate("followingService", followingService);
   fastify.decorate("readingHistoryService", readingHistoryService);
+  fastify.decorate("bookmarkService", bookmarkService);
 });

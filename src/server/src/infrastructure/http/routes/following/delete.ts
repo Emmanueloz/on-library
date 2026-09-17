@@ -28,6 +28,7 @@ export default async function (fastify: FastifyInstance) {
       }
 
       await fastify.readingHistoryService.deleteByUserAndSerie(userId, idSerie);
+      await fastify.bookmarkService.deleteByUserAndSerie(userId, idSerie);
       await fastify.followingService.unfollow(userId, idSerie);
 
       return reply.status(204).send({
