@@ -27,6 +27,7 @@ model User {
   userPermissions UserPermissions[]
   followingSeries FollowingSeries[]
   readChapters    ReadChapters[]
+  bookmarks       Bookmark[]
   role  UserRole @default(USER)
 }
 
@@ -128,6 +129,7 @@ model Chapter {
   groupTitle  String?
   createdAt   DateTime  @default(now())
   readBy    ReadChapters[]
+  bookmarks Bookmark[]
 }
 
 model Media {
@@ -160,4 +162,17 @@ model ReadChapters {
   readAt    DateTime @default(now())
 
   @@unique([idUser, idChapter])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [idUser], references: [id])
+  idUser    String
+  chapter   Chapter  @relation(fields: [idChapter], references: [id])
+  idChapter String
+  type      String
+  page      Float
+  createdAt DateTime @default(now())
+
+  @@unique([idUser, idChapter, type, page])
 }
