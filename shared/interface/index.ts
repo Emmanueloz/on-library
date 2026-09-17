@@ -1,3 +1,4 @@
+export type { IBookmark } from "./bookmark.interface.ts";
 export type { ICategories } from "./categories.interface.ts";
 export type { IChapter } from "./chapter.interface.ts";
 export type { ILibraries } from "./libraries.interface.ts";

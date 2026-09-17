@@ -7,6 +7,7 @@ export enum ModulePermission {
   Libraries = "libraries",
   Following = "following",
   History = "history",
+  Bookmark = "bookmark",
 }
 
 export enum TypePermission {
