@@ -5,6 +5,7 @@ interface IQueryChapters {
   idSeries?: string;
   orderBy?: string;
   orderType?: string;
+  withMedia?: boolean;
 }
 
 export type { IQueryChapters };

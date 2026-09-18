@@ -17,6 +17,7 @@ function Chapter() {
   const { chapter, errorChapter, isLoading } = useChapter({ id });
   const { chapters } = useChaptersBySeries(
     chapter?.series?.id ? String(chapter.series.id) : "",
+    true
   );
   const authContext = use(AuthContext);
   const isAuthenticated = authContext?.isAuthenticated() ?? false;

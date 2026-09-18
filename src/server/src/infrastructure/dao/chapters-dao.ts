@@ -26,6 +26,10 @@ class ChaptersDao implements IChaptersRepo {
       where.number = q.number;
     }
 
+    if (q?.withMedia) {
+      where.media = { some: {} };
+    }
+
     if (q?.orderBy && q.orderType) {
       if (q.orderBy == "number") {
         orderBy.length = 0;

@@ -4,7 +4,7 @@ import type { IChapter } from "@on-library/shared";
 import { AuthContext } from "../context/AuthContex";
 import { buildAuthHeaders } from "../utils/buildAuthHeaders";
 
-const useChaptersBySeries = (idSeries: string) => {
+const useChaptersBySeries = (idSeries: string, withMedia?: boolean) => {
   const [chapters, setChapters] = useState<IChapter[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,12 +21,14 @@ const useChaptersBySeries = (idSeries: string) => {
     setIsLoading(true);
     setError(null);
 
+    let url = `${configEnv.apiUrl}/api/chapters/?idSeries=${idSeries}&orderBy=number&orderType=desc`;
+    if (withMedia) {
+      url += "&withMedia=true";
+    }
+
     try {
       const headers = buildAuthHeaders(token, isAuthenticated());
-      const res = await fetch(
-        `${configEnv.apiUrl}/api/chapters/?idSeries=${idSeries}&orderBy=number&orderType=desc`,
-        { headers },
-      );
+      const res = await fetch(url, { headers });
       const result = await res.json();
 
       if (!res.ok) {
@@ -39,7 +41,7 @@ const useChaptersBySeries = (idSeries: string) => {
     } finally {
       setIsLoading(false);
     }
-  }, [idSeries, token, isAuthenticated]);
+  }, [idSeries, withMedia, token, isAuthenticated]);
 
   useEffect(() => {
     fetchChapters();
