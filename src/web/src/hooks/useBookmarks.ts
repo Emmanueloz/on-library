@@ -8,6 +8,9 @@ interface UseBookmarksResult {
   bookmarks: IBookmark[];
   isLoading: boolean;
   error: string | null;
+  /** Id of the chapter whose bookmarks finished loading (initial fetch or
+   * refetch). null while no fetch has completed for the current chapter. */
+  loadedChapterId: string | null;
   addBookmark: (type: MediaType, page: number) => Promise<boolean>;
   removeBookmark: (id: string) => Promise<boolean>;
   removeAllBookmarks: () => Promise<boolean>;
@@ -21,6 +24,7 @@ const useBookmarks = (
   const [bookmarks, setBookmarks] = useState<IBookmark[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadedChapterId, setLoadedChapterId] = useState<string | null>(null);
 
   const authContext = use(AuthContext);
   if (!authContext) {
@@ -32,6 +36,7 @@ const useBookmarks = (
     if (!chapterId || !enabled || !isAuthenticated()) {
       setBookmarks([]);
       setIsLoading(false);
+      setLoadedChapterId(null);
       return;
     }
 
@@ -63,6 +68,7 @@ const useBookmarks = (
       );
       setBookmarks([]);
     } finally {
+      setLoadedChapterId(chapterId);
       setIsLoading(false);
     }
   }, [chapterId, enabled, token, isAuthenticated]);
@@ -163,6 +169,7 @@ const useBookmarks = (
     bookmarks,
     isLoading,
     error,
+    loadedChapterId,
     addBookmark,
     removeBookmark,
     removeAllBookmarks,

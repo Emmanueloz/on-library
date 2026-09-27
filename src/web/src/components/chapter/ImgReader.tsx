@@ -18,7 +18,13 @@ export function ImgReader({
   onToggleBookmark,
   jumpTarget,
 }: ImgReaderProps) {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [currentPageIndex, setCurrentPageIndex] = useState(() => {
+    if (!jumpTarget) return 0;
+    const index = imageMedia.findIndex(
+      (m) => m.pageNumber === jumpTarget.page,
+    );
+    return index >= 0 ? index : 0;
+  });
   const totalPages = imageMedia.length;
 
   const currentPage = imageMedia[currentPageIndex];

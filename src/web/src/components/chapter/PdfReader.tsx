@@ -15,6 +15,7 @@ import {
   Scroller,
   ScrollPluginPackage,
   useScroll,
+  useScrollCapability,
 } from "@embedpdf/plugin-scroll/react";
 import {
   RenderLayer,
@@ -69,17 +70,29 @@ function CascadeView({
   jumpTarget,
 }: { documentId: string } & BookmarkReaderProps) {
   const { provides: scroll } = useScroll(documentId);
+  const { provides: scrollCapability } = useScrollCapability();
   const lastJumpRef = useRef<BookmarkReaderProps["jumpTarget"]>(null);
+  const [layoutReady, setLayoutReady] = useState(false);
 
   useEffect(() => {
-    if (!jumpTarget || !scroll) return;
+    if (!scrollCapability) return;
+    return scrollCapability.onLayoutReady((event) => {
+      if (event.documentId === documentId) {
+        setLayoutReady(true);
+      }
+    });
+  }, [scrollCapability, documentId]);
+
+  useEffect(() => {
+    if (!jumpTarget || !scroll || !layoutReady) return;
     if (lastJumpRef.current === jumpTarget) return;
     lastJumpRef.current = jumpTarget;
 
     // The Scroller virtualizes pages, so anchors may not exist in the DOM;
-    // scrollToPage computes the position from the layout metrics instead.
+    // scrollToPage computes the position from the layout metrics instead,
+    // but only once the layout is ready (otherwise the jump is lost).
     scroll.scrollToPage({ pageNumber: jumpTarget.page, behavior: "smooth" });
-  }, [jumpTarget, scroll]);
+  }, [jumpTarget, scroll, layoutReady]);
 
   return (
     <Viewport documentId={documentId} className="w-full h-full">
@@ -116,7 +129,12 @@ function PageByPageView({
   documentId: string;
   documentState: DocumentState;
 } & BookmarkReaderProps) {
-  const [pageIndex, setPageIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(() => {
+    const total = documentState.document?.pageCount ?? 0;
+    if (!jumpTarget) return 0;
+    const target = jumpTarget.page - 1;
+    return target >= 0 && target < total ? target : 0;
+  });
   const containerRef = useRef<HTMLDivElement>(null);
   const { width, height } = useContainerSize(containerRef);
 

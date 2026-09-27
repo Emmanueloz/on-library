@@ -26,6 +26,7 @@ function ChapterReader(props: {
   setViewMode: (mode: ViewMode) => void;
   canBookmark: boolean;
   bookmarks: IBookmark[];
+  bookmarksLoadedId: string | null;
   addBookmark: (type: MediaType, page: number) => Promise<boolean>;
   removeBookmark: (id: string) => Promise<boolean>;
   removeAllBookmarks: () => Promise<boolean>;
@@ -42,6 +43,7 @@ function ChapterReader(props: {
     setViewMode,
     canBookmark,
     bookmarks,
+    bookmarksLoadedId,
     addBookmark,
     removeBookmark,
     removeAllBookmarks,
@@ -53,6 +55,28 @@ function ChapterReader(props: {
     page: number;
     at: number;
   } | null>(null);
+
+  // Auto-jump once per chapter to the bookmark closest to the start, but
+  // only for bookmarks that already existed when the chapter was entered
+  // (i.e. the first fetch for this chapter) — never after adding/removing
+  // one, so the user's reading position is never yanked on save.
+  const [lastChapterId, setLastChapterId] = useState(chapter?.id);
+  const [autoJumpDone, setAutoJumpDone] = useState(false);
+  if (chapter?.id !== lastChapterId) {
+    setLastChapterId(chapter?.id);
+    setAutoJumpDone(false);
+  }
+  if (!autoJumpDone && chapter?.id && bookmarksLoadedId === chapter.id) {
+    setAutoJumpDone(true);
+    const pages = bookmarks
+      .filter((b) => b.idChapter === chapter.id)
+      .map((b) => b.page);
+    if (pages.length > 0) {
+      // `at` is only a uniqueness discriminator; a fresh object reference
+      // is enough here since the auto-jump runs once per chapter.
+      setJumpTarget({ page: Math.min(...pages), at: 0 });
+    }
+  }
 
   useEffect(() => {
     if (!toast) return;

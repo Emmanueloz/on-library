@@ -28,6 +28,7 @@ function Chapter() {
   const canBookmark = isAuthenticated && isFollowing;
   const {
     bookmarks,
+    loadedChapterId,
     addBookmark,
     removeBookmark,
     removeAllBookmarks,
@@ -70,6 +71,7 @@ function Chapter() {
         setViewMode={setViewMode}
         canBookmark={canBookmark}
         bookmarks={bookmarks}
+        bookmarksLoadedId={loadedChapterId}
         addBookmark={addBookmark}
         removeBookmark={removeBookmark}
         removeAllBookmarks={removeAllBookmarks}
